@@ -10,7 +10,8 @@ Este proyecto implementa algoritmos para:
 
 1. Conversión de Autómatas Finitos No Deterministas (AFND) a Autómatas Finitos Deterministas (AFD)
 2. Minimización de AFD mediante el algoritmo de partición
-3. Validación de cadenas en autómatas
+3. Validación de cadenas en autómatas (interactiva, individual y masiva)
+4. Graficación visual de autómatas
 
 ### Estructura del Proyecto
 
@@ -18,9 +19,17 @@ Este proyecto implementa algoritmos para:
 ├── src/
 │   ├── __init__.py
 │   ├── automata.py          # Clases para representar AFD y AFND
-│   ├── conversor.py         # Conversión AFND → AFD
+│   ├── conversor.py         # Conversión AFND → AFD (algoritmo tabular)
 │   ├── minimizador.py       # Minimización de AFD
-│   └── manejador_archivos.py # Lectura/escritura de archivos
+│   ├── graficador.py        # Generación de gráficos visuales
+│   ├── manejador_archivos.py # Lectura/escritura de archivos
+│   ├── core/
+│   │   └── procesador.py    # Procesador central de operaciones
+│   ├── interfaces/
+│   │   ├── cli.py           # Interfaz de línea de comandos
+│   │   └── ui.py            # Interfaz de usuario
+│   └── utils/
+│       └── logger.py        # Sistema de logging con iconos
 ├── ejemplos/                # Archivos de ejemplo
 ├── tests/                   # Casos de prueba
 ├── resultados/             # Directorio de salida (generado automáticamente)
@@ -50,16 +59,83 @@ print(verificar_instalacion())
 
 ### Uso
 
-#### Procesamiento completo de un autómata
+#### Opciones de línea de comandos
 
 ```bash
+# Procesamiento completo (conversión + minimización)
 python main.py <archivo_entrada> [directorio_salida]
+
+# Solo conversión AFND → AFD
+python main.py <archivo_entrada> -c
+
+# Solo minimización de AFD
+python main.py <archivo_entrada> -m
+
+# Generar gráficos
+python main.py <archivo_entrada> -g
+
+# Solo generar gráficos
+python main.py <archivo_entrada> --solo-graficar
+
+# Validación interactiva de cadenas
+python main.py <archivo_entrada> -v
+
+# Validar cadena específica
+python main.py <archivo_entrada> -s "cadena"
+
+# Validar múltiples cadenas desde archivo JSON
+python main.py <archivo_entrada> --validar-archivo cadenas.json
+
+# Múltiples formatos de gráficos
+python main.py <archivo_entrada> -g -f png,pdf,svg
 ```
 
-Ejemplo:
+#### Ejemplos de uso:
 
 ```bash
-python main.py ejemplos/afnd_ejemplo1.json resultados/
+# Procesamiento completo con gráficos
+python main.py ejemplos/TP1_Ej9a.json -g -o resultados/
+
+# Solo conversión
+python main.py ejemplos/TP1_Ej9b.json -c
+
+# Validación masiva de cadenas
+python main.py ejemplos/TP1_Ej9a.json --validar-archivo ejemplos/cadenas_prueba.json
+```
+
+### Validación de Múltiples Cadenas
+
+Nueva funcionalidad para validar múltiples cadenas desde un archivo JSON:
+
+#### Formato del archivo de cadenas:
+```json
+{
+  "cadenas": [
+    "",
+    "a",
+    "b",
+    "aa",
+    "ab",
+    "ba",
+    "bb"
+  ]
+}
+```
+
+#### Características:
+- 📝 **Muestra la descripción** del autómata para mejor comprensión
+- 📋 **Procesa todas las cadenas** automáticamente
+- 📊 **Reporte detallado** con tabla organizada (ruta personalizable)
+- 🎯 **Sin resúmenes innecesarios** - solo resultados directos
+
+#### Uso:
+```bash
+python main.py automata.json --validar-archivo cadenas.json
+
+# El sistema pregunta si generar reporte y dónde guardarlo:
+# ¿Deseas guardar un reporte detallado? (s/N): s
+# Ingresa la ruta y nombre del archivo (sin extensión): reportes/validacion_automata
+# 📄 Reporte guardado: reportes/validacion_automata.txt
 ```
 
 #### Formatos de archivo soportados
@@ -140,8 +216,9 @@ q0,a,q1,q2
 
 #### 1. Conversión AFND → AFD
 
-- Algoritmo de construcción de subconjuntos
+- **Algoritmo tabular optimizado** de construcción de subconjuntos
 - Manejo de transiciones epsilon
+- Eliminación automática de estados inútiles durante la conversión
 - Generación de reporte detallado del proceso
 
 #### 2. Minimización de AFD
@@ -149,12 +226,14 @@ q0,a,q1,q2
 - Algoritmo de partición de estados equivalentes
 - Eliminación de estados inalcanzables
 - Análisis de reducción de estados
+- Reporte detallado con análisis de particiones
 
 #### 3. Validación de cadenas
 
-- Modo interactivo para probar cadenas
-- Verificación automática de equivalencia entre autómatas
-- Generación de cadenas de prueba
+- **Modo interactivo** para probar cadenas individualmente
+- **Validación de cadena específica** desde línea de comandos
+- **Validación masiva** desde archivo JSON con reporte detallado
+- Verificación automática y silenciosa de equivalencia entre autómatas
 
 #### 4. Graficación y Visualización
 
@@ -231,11 +310,11 @@ graficador.configurar_estilo(
 
 #### Comparación de autómatas:
 ```python
-from src.conversor import ConversorAFNDaAFD
+from src.conversor import ConversorTabular
 
 # Convertir AFND a AFD
 afnd = ManejadorArchivos.cargar_automata_desde_json('ejemplos/afnd_ejemplo.json')
-conversor = ConversorAFNDaAFD()
+conversor = ConversorTabular()
 afd = conversor.convertir(afnd)
 
 # Generar comparación lado a lado
@@ -324,37 +403,53 @@ print(f"Ejecutable disponible: {info['ejecutable_disponible']}")
 print(f"Versión: {info['version']}")
 print(f"Mensaje: {info['mensaje']}")
 ```
+
 ### Algoritmos Implementados
 
-### 1. Algoritmo de Conversión AFND → AFD (Construcción de Subconjuntos)
+### 1. Algoritmo de Conversión AFND → AFD (Tabular Optimizado)
 
-Este algoritmo convierte un Autómata Finito No Determinista en un Autómata Finito Determinista equivalente.
+Este algoritmo convierte un Autómata Finito No Determinista en un Autómata Finito Determinista equivalente usando un enfoque tabular optimizado.
+
+#### Mejoras del algoritmo tabular:
+
+1. **Eliminación temprana de estados inútiles**: Durante la construcción de la tabla AFND, se eliminan estados que no pueden alcanzar estados finales
+
+2. **Representación tabular eficiente**: Opera directamente sobre tablas de transiciones en lugar de listas
+
+3. **Optimización automática**: Elimina estados sumidero no aceptadores en el AFD resultante
 
 #### Funcionamiento:
 
-1. **Estado Inicial**: Se calcula la clausura epsilon del estado inicial del AFND
-    - Si el AFND tiene transiciones epsilon (ε), se incluyen todos los estados alcanzables mediante estas transiciones
-
-2. **Construcción de Estados**: Cada estado del AFD representa un conjunto de estados del AFND
-    - Se procesan todos los conjuntos de estados alcanzables
-    - Para cada símbolo del alfabeto, se calcula el conjunto de estados destino
-
-3. **Proceso Iterativo**:
+1. **Construcción de tabla AFND filtrada**:
    ```
+   Para cada estado del AFND:
+     - Verificar si puede alcanzar estados finales
+     - Si no puede, eliminarlo desde el inicio
+     - Construir tabla de transiciones solo con estados útiles
+   ```
+
+2. **Generación de tabla AFD**:
+   ```
+   Estado inicial = clausura_epsilon(estado_inicial_AFND)
+   
    Mientras haya conjuntos sin procesar:
-     - Tomar un conjunto de estados del AFND
-     - Para cada símbolo 'a' del alfabeto:
-       * Calcular todos los estados alcanzables con 'a'
-       * Aplicar clausura epsilon si es necesario
-       * Crear nueva transición en el AFD
+     - Para cada símbolo del alfabeto:
+       * Calcular conjunto destino desde la tabla AFND
+       * Verificar si puede alcanzar estados finales
+       * Si puede, crear transición en tabla AFD
+       * Si no puede, marcar como transición nula
    ```
 
-4. **Estados Finales**: Un estado del AFD es final si contiene al menos un estado final del AFND original
+3. **Optimización post-generación**:
+   - Identificar y eliminar estados sumidero no aceptadores
+   - Actualizar transiciones que apuntaban a estados eliminados
 
-#### Ejemplo:
+4. **Construcción del AFD**: Se crea el objeto AFD desde la tabla optimizada
 
-Si tenemos un AFND con estados {q0, q1, q2} y el estado q0 puede ir a {q1, q2} con el símbolo 'a', entonces en el AFD
-tendremos un estado que represente el conjunto {q1, q2}.
+#### Ventajas del algoritmo tabular:
+- **Mayor eficiencia**: Elimina estados inútiles desde el principio
+- **Menos estados resultantes**: Produce AFDs más compactos
+- **Mejor rendimiento**: Evita procesamiento innecesario de estados inútiles
 
 ### 2. Algoritmo de Minimización de AFD (Partición de Estados)
 
@@ -391,10 +486,8 @@ Dos estados son equivalentes si:
 - Ambos son finales o ambos son no finales
 - Para cada símbolo del alfabeto, van a estados equivalentes
 
-#### Ejemplo:
-
-Si tenemos estados q1 y q2 que para todos los símbolos van a los mismos estados destino y ambos son finales (o no
-finales), entonces son equivalentes y se pueden fusionar.
+#### Terminación:
+El algoritmo termina cuando el conjunto de particiones K es igual al conjunto de particiones K-1, siguiendo el procedimiento estándar de minimización.
 
 ### 3. Algoritmo de Validación de Cadenas
 
@@ -476,3 +569,20 @@ afd_minimizado = minimizador.minimizar(afd)
 print(afd.validar_cadena("ab"))  # True
 ```
 
+#### Uso del conversor tabular
+
+```python
+from src.conversor import ConversorTabular
+from src.manejador_archivos import ManejadorArchivos
+
+# Cargar AFND desde archivo
+afnd = ManejadorArchivos().cargar_automata_desde_json('ejemplos/afnd_ejemplo.json')
+
+# Convertir usando algoritmo tabular optimizado
+conversor = ConversorTabular()
+afd = conversor.convertir(afnd)
+
+# Generar reporte del proceso
+reporte = conversor.generar_reporte(afnd, afd)
+print(reporte)
+```

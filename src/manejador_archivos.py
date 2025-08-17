@@ -93,6 +93,9 @@ class ManejadorArchivos:
                     if simbolo != '' and simbolo not in alfabeto:
                         raise ValueError(f"❌ Símbolo '{simbolo}' en transición {i+1} no está en el alfabeto")
 
+                    # Crear clave para la transición
+                    clave = (origen, simbolo)
+
                     # Validar destinos
                     if isinstance(destino, list):
                         if not destino:
@@ -100,11 +103,29 @@ class ManejadorArchivos:
                         for dest in destino:
                             if dest not in estados:
                                 raise ValueError(f"❌ Estado destino '{dest}' en transición {i+1} no está en el conjunto de estados")
-                        transiciones[(origen, simbolo)] = set(destino)
+
+                        # Si ya existe la transición, agregar los destinos al conjunto existente
+                        if clave in transiciones:
+                            if isinstance(transiciones[clave], set):
+                                transiciones[clave].update(destino)
+                            else:
+                                # Convertir destino único existente a conjunto y agregar nuevos destinos
+                                transiciones[clave] = {transiciones[clave]} | set(destino)
+                        else:
+                            transiciones[clave] = set(destino)
                     else:
                         if destino not in estados:
                             raise ValueError(f"❌ Estado destino '{destino}' en transición {i+1} no está en el conjunto de estados")
-                        transiciones[(origen, simbolo)] = destino
+
+                        # Si ya existe la transición, convertir a conjunto y agregar el nuevo destino
+                        if clave in transiciones:
+                            if isinstance(transiciones[clave], set):
+                                transiciones[clave].add(destino)
+                            else:
+                                # Convertir a conjunto con el destino existente y el nuevo
+                                transiciones[clave] = {transiciones[clave], destino}
+                        else:
+                            transiciones[clave] = destino
 
                 except Exception as e:
                     raise ValueError(f"❌ Error en transición {i+1}: {e}")

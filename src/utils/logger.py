@@ -49,12 +49,14 @@ class Iconos:
     DIRECTORIO = "📁"
     REPORTE = "📋"
 
-    # Estadísticas
+    # Iconos adicionales para validación
     ESTADOS = "🔵"
     TRANSICIONES = "➡️"
     ALFABETO = "🔤"
     INICIAL = "🟢"
     FINAL = "🔴"
+    ESTADISTICA = "📊"
+    PORCENTAJE = "📈"
     REDUCCION = "📉"
 
 

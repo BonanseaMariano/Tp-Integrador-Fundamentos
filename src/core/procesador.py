@@ -8,7 +8,7 @@ from typing import Dict, Optional, Any
 import os
 
 from src.automata import AFD, AFND
-from src.conversor import ConversorAFNDaAFD
+from src.conversor import ConversorTabular
 from src.minimizador import MinimizadorAFD
 from src.manejador_archivos import ManejadorArchivos
 
@@ -27,7 +27,7 @@ class ProcesadorAutomatas:
 
     def __init__(self, logger: Logger):
         self.logger = logger
-        self.conversor = ConversorAFNDaAFD()
+        self.conversor = ConversorTabular()  # Ahora usa el conversor tabular como predeterminado
         self.minimizador = MinimizadorAFD()
         self.manejador_archivos = ManejadorArchivos()
         self._graficador = None
@@ -337,7 +337,7 @@ class ProcesadorAutomatas:
 
         # Reporte de conversión (si aplica)
         if isinstance(resultados['original'], AFND):
-            reporte_conversion = self.conversor.generar_reporte_conversion(
+            reporte_conversion = self.conversor.generar_reporte(
                 resultados['original'], resultados['afd']
             )
             ruta_reporte = os.path.join(directorio_salida, "reporte_conversion.txt")
@@ -369,7 +369,7 @@ class ProcesadorAutomatas:
         self.logger.info(f"AFD guardado en: {archivo_afd}", Iconos.GUARDANDO)
 
         if generar_reporte:
-            reporte = self.conversor.generar_reporte_conversion(afnd, afd)
+            reporte = self.conversor.generar_reporte(afnd, afd)  # Usa el conversor tabular
             archivo_reporte = os.path.join(directorio_salida, f"{nombre_base}_reporte_conversion.txt")
             with open(archivo_reporte, 'w', encoding='utf-8') as f:
                 f.write(reporte)
@@ -392,10 +392,60 @@ class ProcesadorAutomatas:
                 f.write(reporte)
             self.logger.info(f"Reporte guardado en: {archivo_reporte}", Iconos.REPORTE)
 
+    def convertir_tabular(self, archivo_entrada: str, directorio_salida: str = "resultados",
+                         generar_reporte: bool = True) -> Optional[AFD]:
+        """Convierte AFND a AFD usando el algoritmo tabular optimizado."""
+        self.logger.separador("CONVERSIÓN TABULAR AFND → AFD")
+        self.logger.info(f"Cargando AFND desde: {archivo_entrada}", Iconos.CARGANDO)
+
+        try:
+            automata_original = self._cargar_automata(archivo_entrada)
+
+            if not isinstance(automata_original, AFND):
+                self.logger.warning(f"El autómata ya es {type(automata_original).__name__}")
+                return automata_original
+
+            self.logger.info(f"AFND cargado: {len(automata_original.estados)} estados", Iconos.AFND)
+
+            # Conversión tabular
+            self.logger.info("Ejecutando algoritmo tabular optimizado...", Iconos.PROCESANDO)
+            afd = self.conversor.convertir(automata_original)
+            self.logger.success(f"Conversión tabular completada: {len(afd.estados)} estados", Iconos.AFD)
+
+            # Mostrar comparación de eficiencia
+            reduccion = len(automata_original.estados) - len(afd.estados)
+            eficiencia = (reduccion / len(automata_original.estados)) * 100 if len(automata_original.estados) > 0 else 0
+            self.logger.info(f"Eficiencia del algoritmo tabular: {eficiencia:.1f}% reducción", Iconos.REDUCCION)
+
+            # Guardar resultado
+            if directorio_salida:
+                self._guardar_conversion_tabular(automata_original, afd, archivo_entrada, directorio_salida, generar_reporte)
+
+            return afd
+
+        except Exception as e:
+            self.logger.error(f"Error durante la conversión tabular: {e}")
+            return None
+
+    def _guardar_conversion_tabular(self, afnd, afd, archivo_entrada, directorio_salida, generar_reporte):
+        """Guarda los resultados de la conversión tabular."""
+        Path(directorio_salida).mkdir(parents=True, exist_ok=True)
+
+        nombre_base = Path(archivo_entrada).stem
+        archivo_afd = os.path.join(directorio_salida, f"{nombre_base}_tabular.json")
+
+        self.manejador_archivos.guardar_automata_como_json(afd, archivo_afd)
+        self.logger.info(f"AFD tabular guardado en: {archivo_afd}", Iconos.GUARDANDO)
+
+        if generar_reporte:
+            reporte = self.conversor.generar_reporte(afnd, afd)
+            archivo_reporte = os.path.join(directorio_salida, f"{nombre_base}_reporte_tabular.txt")
+            with open(archivo_reporte, 'w', encoding='utf-8') as f:
+                f.write(reporte)
+            self.logger.info(f"Reporte tabular guardado en: {archivo_reporte}", Iconos.REPORTE)
+
     def _validar_equivalencia(self, resultados):
         """Valida que los autómatas sean equivalentes probando cadenas."""
-        self.logger.info("Validando equivalencia...", Iconos.VALIDACION)
-
         original = resultados['original']
         minimizado = resultados['minimizado']
 
@@ -411,10 +461,10 @@ class ProcesadorAutomatas:
                 self.logger.error(f"¡ERROR! Cadena '{cadena}': Original={acepta_original}, Minimizado={acepta_minimizado}")
                 equivalentes = False
 
-        if equivalentes:
-            self.logger.success(f"Equivalencia verificada con {len(cadenas_prueba)} cadenas de prueba", Iconos.CHECK)
-        else:
+        # Solo mostrar mensaje si hay error
+        if not equivalentes:
             self.logger.error("Los autómatas NO son equivalentes", Iconos.CRUZ)
+        # Si son equivalentes, no mostrar nada (validación silenciosa)
 
     def _generar_cadenas_prueba(self, automata):
         """Genera cadenas de prueba para validar equivalencia."""

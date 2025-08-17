@@ -39,6 +39,7 @@ Ejemplos de uso:
   python main.py archivo.json -m                       # Solo minimización AFD
   python main.py archivo.json -v                       # Modo interactivo validación
   python main.py archivo.json -s "cadena"              # Validar cadena específica
+  python main.py archivo.json --validar-archivo test.json  # Validar múltiples cadenas
   python main.py archivo.json -g -f png,pdf,svg        # Múltiples formatos gráficos
 
 Formatos soportados:
@@ -73,6 +74,9 @@ Graficación requiere Graphviz instalado:
 
         grupo_procesamiento.add_argument('-s', '--string', metavar='CADENA',
                                        help='Validar una cadena específica')
+
+        grupo_procesamiento.add_argument('--validar-archivo', metavar='ARCHIVO_JSON',
+                                       help='Validar múltiples cadenas desde archivo JSON con el autómata especificado')
 
         # Opciones de graficación
         parser.add_argument('-g', '--graficar', action='store_true',
@@ -145,6 +149,10 @@ Graficación requiere Graphviz instalado:
             elif args.string:
                 # Validar cadena específica
                 return ui.validar_cadena_especifica(args.archivo, args.string)
+
+            elif args.validar_archivo:
+                # Validar múltiples cadenas desde archivo JSON
+                return ui.validar_cadenas_desde_archivo(args.archivo, args.validar_archivo)
 
             else:
                 # Procesamiento completo (default)
