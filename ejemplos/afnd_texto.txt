@@ -3,7 +3,6 @@ ALFABETO: 0,1
 ESTADO_INICIAL: q0
 ESTADOS_FINALES: q4
 DESCRIPCION: AFND que acepta cadenas binarias terminadas en '1010'
-TIPO: AFND
 TRANSICIONES:
 q0,0,q0
 q0,1,q0

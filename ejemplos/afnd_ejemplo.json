@@ -13,7 +13,5 @@
     {"origen": "q3", "simbolo": "a", "destino": ["q0", "q1"]},
     {"origen": "q3", "simbolo": "b", "destino": "q0"}
   ],
-  "tipo": "AFND",
   "descripcion": "AFND que acepta solo cadenas que terminan en 'aba'"
 }
-

@@ -1,6 +1,5 @@
 """
-Módulo para convertir AFND a AFD usando representación tabular.
-Este enfoque es más eficiente y fácil de entender que el algoritmo tradicional.
+Módulo para convertir AFND a AFD.
 """
 
 from .automata import AFD, AFND
@@ -13,7 +12,7 @@ class ConversorTabular:
 
     def __init__(self):
         self.tabla_afnd = {}  # Tabla original del AFND
-        self.tabla_afd = {}   # Tabla resultante del AFD
+        self.tabla_afd = {}  # Tabla resultante del AFD
         self.mapeo_estados = {}  # Conjuntos de estados AFND -> estado AFD
         self.estados_procesados = set()
         self.historial = []
@@ -52,7 +51,7 @@ class ConversorTabular:
 
     def _construir_tabla_afnd(self, afnd):
         """Construye la representación tabular del AFND eliminando estados inútiles."""
-        self.historial.append("=== CONSTRUCCIÓN DE TABLA AFND ===")
+        self.historial.append("=== TABLA DE TRANSICIONES ORIGINAL SIN ESTADOS SUMIDERO ===")
 
         # Paso 1: Identificar estados que pueden alcanzar estados finales
         estados_utiles = set()
@@ -61,8 +60,6 @@ class ConversorTabular:
                 estados_utiles.add(estado)
 
         estados_inutiles = afnd.estados - estados_utiles
-        if estados_inutiles:
-            self.historial.append(f"Estados inútiles eliminados desde el AFND: {sorted(estados_inutiles)}")
 
         # Paso 2: Crear tabla solo con estados útiles
         for estado in sorted(estados_utiles):
@@ -90,8 +87,9 @@ class ConversorTabular:
                 self.tabla_afnd[estado][simbolo] = destinos_con_epsilon
 
         # Mostrar tabla construida
-        self.historial.append("Tabla de transiciones del AFND (solo estados útiles):")
         self._agregar_tabla_a_historial(self.tabla_afnd, afnd.estados_finales, "AFND")
+        if estados_inutiles:
+            self.historial.append(f"Estados sumidero eliminados desde el AFND: {sorted(estados_inutiles)}")
 
     def _generar_tabla_afd(self, afnd):
         """Genera la tabla del AFD usando el algoritmo de construcción de subconjuntos."""
@@ -116,7 +114,8 @@ class ConversorTabular:
 
             # Verificar si este conjunto puede alcanzar estados finales
             if not self._puede_alcanzar_final(conjunto_actual, afnd):
-                self.historial.append(f"Omitiendo conjunto {sorted(conjunto_actual)} - no puede alcanzar estados finales")
+                self.historial.append(
+                    f"Omitiendo conjunto {sorted(conjunto_actual)} - no puede alcanzar estados finales")
                 continue
 
             self.estados_procesados.add(conjunto_key)
@@ -149,7 +148,7 @@ class ConversorTabular:
                         # Agregar a la cola si no ha sido procesado
                         conjunto_destino_key = frozenset(conjunto_destino)
                         if (conjunto_destino_key not in self.estados_procesados and
-                            conjunto_destino not in por_procesar):
+                                conjunto_destino not in por_procesar):
                             por_procesar.append(conjunto_destino)
                     else:
                         # El destino no puede alcanzar estados finales, no crear transición
@@ -160,9 +159,7 @@ class ConversorTabular:
                     self.tabla_afd[nombre_estado][simbolo] = None
 
         # Mostrar tabla generada
-        self.historial.append("\nTabla de transiciones del AFD generada:")
         estados_finales_afd = self._calcular_estados_finales_afd(afnd)
-        self._agregar_tabla_a_historial(self.tabla_afd, estados_finales_afd, "AFD")
 
     def _optimizar_tabla_afd(self, afnd):
         """Elimina estados inútiles de la tabla del AFD."""
@@ -241,8 +238,10 @@ class ConversorTabular:
             descripcion=f"AFD convertido desde AFND - {getattr(afnd, 'descripcion', '')}"
         )
 
-        self.historial.append(f"\n=== AFD CONSTRUIDO ===")
-        self.historial.append(f"Estados: {len(estados_afd)} (reducción desde {len(afnd.estados)} del AFND)")
+        # Personalización del historial para el reporte
+        self.historial.append("\n=== TABLA DE TRANSICIONES DEL AFD CONSTRUIDO ===")
+        self._agregar_tabla_a_historial(self.tabla_afd, estados_finales_afd, "AFD Construido")
+        self.historial.append(f"Estados: {len(estados_afd)}")
         self.historial.append(f"Transiciones: {len(transiciones_afd)}")
 
         return afd
@@ -389,24 +388,27 @@ class ConversorTabular:
     def generar_reporte(self, afnd, afd):
         """Genera un reporte completo de la conversión tabular."""
         reporte = []
-        reporte.append("=" * 70)
-        reporte.append("REPORTE DE CONVERSIÓN TABULAR AFND → AFD")
-        reporte.append("=" * 70)
+        reporte.append("=" * 69)
+        reporte.append("REPORTE DE ELIMINACIÓN DE NO DETERMINISMO")
+        reporte.append("=" * 69)
         reporte.append("")
-
-        # Información general
         reporte.append("RESUMEN:")
-        reporte.append(f"  • Método: Algoritmo tabular optimizado")
         reporte.append(f"  • Estados AFND: {len(afnd.estados)}")
         reporte.append(f"  • Estados AFD: {len(afd.estados)}")
-        reporte.append(f"  • Reducción: {len(afnd.estados) - len(afd.estados)} estados")
-        reporte.append(f"  • Eficiencia: {(1 - len(afd.estados)/len(afnd.estados)) * 100:.1f}% reducción")
         reporte.append("")
-
-        # Proceso detallado
         reporte.append("PROCESO DETALLADO:")
         reporte.append("-" * 50)
         for linea in self.historial:
+            if "=== OPTIMIZACIÓN DE TABLA AFD ===" in linea:
+                continue
+            if "=== AFD CONSTRUIDO ===" in linea:
+                reporte.append(linea)
+                continue
+            if linea.startswith("Estados:") or linea.startswith("Transiciones:"):
+                continue
+            if "Estados:" in linea and "reducción" in linea:
+                partes = linea.split("(")
+                reporte.append(partes[0].strip())
+                continue
             reporte.append(linea)
-
         return "\n".join(reporte)

@@ -16,7 +16,5 @@
     {"origen": "S4", "simbolo": "a", "destino": "S4"},
     {"origen": "S4", "simbolo": "b", "destino": "S4"}
   ],
-  "tipo": "AFND",
   "descripcion": "AFND del ejercicio 9b del TP1 con transición no determinista desde S0 con 'a'"
 }
-

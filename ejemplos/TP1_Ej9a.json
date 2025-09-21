@@ -18,7 +18,5 @@
     {"origen": "S5", "simbolo": "a", "destino": "S5"},
     {"origen": "S5", "simbolo": "b", "destino": "S5"}
   ],
-  "tipo": "AFND",
   "descripcion": "AFND del ejercicio 9a del TP1"
 }
-

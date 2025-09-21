@@ -134,9 +134,7 @@ class ManejadorArchivos:
             es_afnd = any(isinstance(destino, set) for destino in transiciones.values())
             es_afnd = es_afnd or '' in alfabeto  # También si tiene transiciones epsilon
 
-            tipo = datos.get('tipo', 'AFND' if es_afnd else 'AFD')
-
-            if tipo == 'AFND' or es_afnd:
+            if es_afnd:
                 return AFND(estados, alfabeto, estado_inicial, estados_finales, transiciones, descripcion)
             else:
                 return AFD(estados, alfabeto, estado_inicial, estados_finales, transiciones, descripcion)
@@ -186,7 +184,7 @@ class ManejadorArchivos:
                 datos['descripcion'] = automata.descripcion
 
             if incluir_metadatos:
-                datos['tipo'] = 'AFD' if isinstance(automata, AFD) else 'AFND'
+                # datos['tipo'] = 'AFD' if isinstance(automata, AFD) else 'AFND'  # Eliminado
                 datos['num_estados'] = len(automata.estados)
                 datos['num_transiciones'] = len(automata.transiciones)
 
@@ -406,8 +404,8 @@ class ManejadorArchivos:
                     archivo.write(f"DESCRIPCION: {automata.descripcion}\n")
 
                 # Escribir tipo
-                tipo = 'AFD' if isinstance(automata, AFD) else 'AFND'
-                archivo.write(f"TIPO: {tipo}\n")
+                # tipo = 'AFD' if isinstance(automata, AFD) else 'AFND'  # Eliminado
+                # archivo.write(f"TIPO: {tipo}\n")  # Eliminado
 
                 archivo.write("TRANSICIONES:\n")
 

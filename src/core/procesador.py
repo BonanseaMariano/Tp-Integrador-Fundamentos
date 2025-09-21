@@ -92,9 +92,6 @@ class ProcesadorAutomatas:
             if generar_reportes:
                 self._generar_reportes(resultados, directorio_salida)
 
-            # Validar equivalencia
-            self._validar_equivalencia(resultados)
-
             self.logger.separador("PROCESAMIENTO COMPLETADO")
             return resultados
 
@@ -140,6 +137,13 @@ class ProcesadorAutomatas:
 
         try:
             automata_original = self._cargar_automata(archivo_entrada)
+
+            if isinstance(automata_original, AFND):
+                self.logger.info("El autómata es no determinista, convirtiendo a AFD antes de minimizar...", Iconos.CONVERSION)
+                from src.conversor import ConversorTabular
+                conversor = ConversorTabular()
+                automata_original = conversor.convertir(automata_original)
+                self.logger.success("Conversión a AFD completada", Iconos.AFD)
 
             if isinstance(automata_original, AFND):
                 self.logger.error("Para minimizar, primero debe convertir el AFND a AFD")
@@ -287,15 +291,6 @@ class ProcesadorAutomatas:
                 )
                 self.logger.info(f"Gráfico de minimización: {archivo_minimizacion}", Iconos.GRAFICO)
 
-                # Gráfico final
-                archivo_final = graficador.generar_grafico(
-                    automata=afd_minimizado,
-                    nombre_archivo="automata_final",
-                    directorio=directorio_salida,
-                    incluir_titulo=True
-                )
-                self.logger.info(f"Gráfico final: {archivo_final}", Iconos.GRAFICO)
-
             except Exception as e:
                 self.logger.warning(f"Error generando gráficos de minimización: {e}")
 
@@ -312,10 +307,10 @@ class ProcesadorAutomatas:
         Path(directorio_salida).mkdir(parents=True, exist_ok=True)
         self.logger.info("Guardando resultados...", Iconos.GUARDANDO)
 
-        # Guardar autómata original
-        nombre_original = os.path.join(directorio_salida, "automata_original.json")
-        self.manejador_archivos.guardar_automata_como_json(resultados['original'], nombre_original)
-        self.logger.info(f"Guardado: {nombre_original}", Iconos.ARCHIVO)
+        # Ya no se guarda el autómata original porque es innecesario
+        # nombre_original = os.path.join(directorio_salida, "automata_original.json")
+        # self.manejador_archivos.guardar_automata_como_json(resultados['original'], nombre_original)
+        # self.logger.info(f"Guardado: {nombre_original}", Iconos.ARCHIVO)
 
         # Guardar AFD (si es diferente del original)
         if resultados['afd'] != resultados['original']:

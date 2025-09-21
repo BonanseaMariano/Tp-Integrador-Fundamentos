@@ -7,7 +7,5 @@
     {"origen": "q0", "simbolo": "a", "destino": "q1"},
     {"origen": "q1", "simbolo": "b", "destino": "q2"}
   ],
-  "tipo": "AFD",
   "descripcion": "AFD simple que acepta cadenas de la forma 'ab'"
 }
-

@@ -230,161 +230,39 @@ class MinimizadorAFD:
 
     def generar_reporte_minimizacion(self, afd_original, afd_minimizado):
         """
-        Genera un reporte detallado de la minimización con representación tabular.
-
-        Args:
-            afd_original: AFD original
-            afd_minimizado: AFD minimizado
-
-        Returns:
-            str: Reporte de la minimización con tablas
+        Genera el reporte de minimización con el formato y títulos solicitados, y una sección final de estados equivalentes.
         """
         reporte = []
-        reporte.append("=" * 60)
-        reporte.append("REPORTE DE MINIMIZACIÓN AFD")
-        reporte.append("=" * 60)
+        reporte.append("=" * 69)
+        reporte.append("REPORTE DE MINIMIZACIÓN")
+        reporte.append("=" * 69)
         reporte.append("")
-
-        # Información general
-        reporte.append("RESUMEN:")
-        reduccion = len(afd_original.estados) - len(afd_minimizado.estados)
-        porcentaje = (reduccion / len(afd_original.estados)) * 100 if len(afd_original.estados) > 0 else 0
-        reporte.append(f"  • Estados originales: {len(afd_original.estados)}")
-        reporte.append(f"  • Estados minimizados: {len(afd_minimizado.estados)}")
-        reporte.append(f"  • Reducción: {reduccion} estados eliminados ({porcentaje:.1f}%)")
-        reporte.append(f"  • Transiciones originales: {len(afd_original.transiciones)}")
-        reporte.append(f"  • Transiciones minimizadas: {len(afd_minimizado.transiciones)}")
-        reporte.append("")
-
-        # Análisis detallado de particiones
-        reporte.append("ANÁLISIS DETALLADO DE PARTICIONES:")
-        reporte.append("-" * 40)
-        if self.particiones:
-            # Analizar específicamente los estados que mencionaste
-            estados_interes = ["{S1,S2}", "{S1,S2,S3}"]
-            for iteracion, particion in enumerate(self.particiones):
-                reporte.append(f"Iteración {iteracion}:")
-                for i, grupo in enumerate(particion):
-                    estados_grupo = [str(e) for e in sorted(grupo, key=str)]
-                    # Marcar si contiene estados de interés
-                    contiene_interes = any(estado in estados_grupo for estado in estados_interes)
-                    marca = " ★" if contiene_interes else ""
-                    reporte.append(f"  Partición {i}: {{{', '.join(estados_grupo)}}}{marca}")
-
-                    # Si contiene estados de interés, analizar por qué están separados o juntos
-                    if contiene_interes and len([e for e in estados_interes if e in estados_grupo]) == 2:
-                        reporte.append(f"    → {estados_interes[0]} y {estados_interes[1]} están en la misma partición")
-                    elif contiene_interes:
-                        for estado in estados_interes:
-                            if estado in estados_grupo:
-                                reporte.append(f"    → {estado} está en esta partición")
-                reporte.append("")
-
-        # Tabla del AFD original
-        reporte.append("AUTÓMATA ORIGINAL (AFD):")
-        reporte.append("-" * 40)
+        reporte.append("AUTÓMATA ORIGINAL:")
         reporte.extend(self._generar_tabla_transiciones(afd_original))
         reporte.append("")
-
-        # Tabla del AFD minimizado
-        reporte.append("AUTÓMATA MINIMIZADO (AFD):")
-        reporte.append("-" * 40)
+        reporte.append("AUTÓMATA MINIMIZADO:")
         reporte.extend(self._generar_tabla_transiciones(afd_minimizado))
         reporte.append("")
-
-        # Proceso de minimización detallado
-        reporte.append("PROCESO DE MINIMIZACIÓN DETALLADO:")
-        reporte.append("-" * 40)
-        for i, paso in enumerate(self.historial_minimizacion, 1):
-            reporte.append(f"{i:2}. {paso}")
+        # Sección de estados equivalentes
+        reporte.append("ESTADOS EQUIVALENTES:")
+        particion_final = self.particiones[-1] if self.particiones else []
+        for grupo in particion_final:
+            if len(grupo) > 1:
+                estados = sorted(grupo, key=str)
+                representante = min(grupo, key=str)
+                reporte.append(f"  {{{', '.join(estados)}}} -> {representante}")
         reporte.append("")
-
-        # Mapeo de estados equivalentes
-        reporte.append("MAPEO DE ESTADOS EQUIVALENTES:")
-        reporte.append("-" * 40)
-        if hasattr(self, 'particiones') and self.particiones:
-            particion_final = self.particiones[-1] if self.particiones else []
-            for i, grupo in enumerate(particion_final):
-                if len(grupo) > 1:
-                    representante = min(grupo, key=str)
-                    estados_equivalentes = sorted(grupo - {representante}, key=str)
-                    if estados_equivalentes:
-                        reporte.append(f"  {representante} ≡ {{{', '.join(estados_equivalentes)}}}")
-
-        # Análisis específico de por qué {S1,S2} y {S1,S2,S3} no se combinaron
-        reporte.append("")
-        reporte.append("ANÁLISIS DE EQUIVALENCIA {S1,S2} vs {S1,S2,S3}:")
-        reporte.append("-" * 40)
-        if "{S1,S2}" in afd_original.estados and "{S1,S2,S3}" in afd_original.estados:
-            # Analizar transiciones
-            trans_s1s2 = {}
-            trans_s1s2s3 = {}
-
-            for simbolo in sorted(afd_original.alfabeto):
-                trans_s1s2[simbolo] = afd_original.transiciones.get(("{S1,S2}", simbolo), "∅")
-                trans_s1s2s3[simbolo] = afd_original.transiciones.get(("{S1,S2,S3}", simbolo), "∅")
-
-            reporte.append("Transiciones:")
-            for simbolo in sorted(afd_original.alfabeto):
-                reporte.append(f"  Con '{simbolo}':")
-                reporte.append(f"    {{S1,S2}} → {trans_s1s2[simbolo]}")
-                reporte.append(f"    {{S1,S2,S3}} → {trans_s1s2s3[simbolo]}")
-
-                # Verificar si van a la misma partición
-                if self.particiones:
-                    particion_final = self.particiones[-1]
-                    destino1 = trans_s1s2[simbolo]
-                    destino2 = trans_s1s2s3[simbolo]
-
-                    if destino1 != "∅" and destino2 != "∅":
-                        grupo1 = self._encontrar_grupo_de_estado(destino1, particion_final)
-                        grupo2 = self._encontrar_grupo_de_estado(destino2, particion_final)
-
-                        if grupo1 == grupo2:
-                            reporte.append(f"    ✓ Ambos destinos están en la partición {grupo1}")
-                        else:
-                            reporte.append(f"    ✗ Destinos en particiones diferentes: {grupo1} vs {grupo2}")
-        reporte.append("")
-
-        # Verificación de equivalencia
-        reporte.append("VERIFICACIÓN DE EQUIVALENCIA:")
-        reporte.append("-" * 40)
-        reporte.append("Ambos autómatas aceptan el mismo lenguaje:")
-        reporte.append(f"  • Estado inicial original: {afd_original.estado_inicial}")
-        reporte.append(f"  • Estado inicial minimizado: {afd_minimizado.estado_inicial}")
-        reporte.append(f"  • Estados finales originales: {sorted(afd_original.estados_finales)}")
-        reporte.append(f"  • Estados finales minimizados: {sorted(afd_minimizado.estados_finales)}")
-
         return "\n".join(reporte)
 
     def _generar_tabla_transiciones(self, automata):
         """
         Genera una representación tabular de las transiciones del autómata.
-
-        Args:
-            automata: AFD para generar la tabla
-
-        Returns:
-            list: Lista de strings representando la tabla
+        Si una transición no va a ningún estado, muestra "-" en vez de "∅".
         """
         tabla = []
-
-        # Información básica
-        tabla.append(f"Tipo: AFD")
-        tabla.append(f"Estados: {sorted(automata.estados, key=str)}")
-        tabla.append(f"Alfabeto: {sorted(automata.alfabeto, key=str)}")
-        tabla.append(f"Estado inicial: {automata.estado_inicial}")
-        tabla.append(f"Estados finales: {sorted(automata.estados_finales, key=str)}")
-        tabla.append("")
-
-        # Crear tabla de transiciones
         estados_ordenados = sorted(automata.estados, key=str)
         alfabeto_ordenado = sorted(automata.alfabeto, key=str)
-
-        # Encabezado de la tabla
         encabezado = ["δ"] + [str(simbolo) for simbolo in alfabeto_ordenado] + ["F"]
-
-        # Calcular anchos de columnas
         ancho_estado = max(len(str(estado)) for estado in estados_ordenados + [encabezado[0]])
         anchos_simbolos = []
         for i, simbolo in enumerate(alfabeto_ordenado, 1):
@@ -394,17 +272,14 @@ class MinimizadorAFD:
                     destino = automata.transiciones[(estado, simbolo)]
                     destinos_str = str(destino)
                     ancho_simbolo = max(ancho_simbolo, len(destinos_str))
+                else:
+                    ancho_simbolo = max(ancho_simbolo, 1)  # Para el "-"
             anchos_simbolos.append(ancho_simbolo)
-
-        ancho_final = 1  # Para la columna F (0 o 1)
-
-        # Generar línea de separación
+        ancho_final = 1
         separador = "+" + "-" * (ancho_estado + 2)
         for ancho in anchos_simbolos:
             separador += "+" + "-" * (ancho + 2)
         separador += "+" + "-" * (ancho_final + 2) + "+"
-
-        # Agregar encabezado
         tabla.append(separador)
         linea_encabezado = f"| {encabezado[0]:^{ancho_estado}} "
         for i, simbolo in enumerate(alfabeto_ordenado):
@@ -412,27 +287,17 @@ class MinimizadorAFD:
         linea_encabezado += f"| {'F':^{ancho_final}} |"
         tabla.append(linea_encabezado)
         tabla.append(separador)
-
-        # Agregar filas de estados
         for estado in estados_ordenados:
             linea = f"| {str(estado):^{ancho_estado}} "
-
-            # Columnas de transiciones
             for i, simbolo in enumerate(alfabeto_ordenado):
                 if (estado, simbolo) in automata.transiciones:
                     destino = automata.transiciones[(estado, simbolo)]
                     destinos_str = str(destino)
                 else:
-                    destinos_str = "∅"  # Conjunto vacío
-
+                    destinos_str = "-"
                 linea += f"| {destinos_str:^{anchos_simbolos[i]}} "
-
-            # Columna de estado final
             es_final = "1" if estado in automata.estados_finales else "0"
             linea += f"| {es_final:^{ancho_final}} |"
             tabla.append(linea)
-
         tabla.append(separador)
-
         return tabla
-
