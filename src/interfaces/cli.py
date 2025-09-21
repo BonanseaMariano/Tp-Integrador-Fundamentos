@@ -9,6 +9,7 @@ from typing import Any
 # Importación directa sin ruta relativa
 try:
     from src.graficador import verificar_instalacion
+
     GRAFICACION_DISPONIBLE = True
 except ImportError:
     GRAFICACION_DISPONIBLE = False
@@ -46,7 +47,7 @@ Formatos soportados:
   - JSON: Formato estructurado con campos definidos
   - TXT:  Formato de texto plano con secciones
 
-Graficación requiere Graphviz instalado:
+La graficación requiere tener Graphviz instalado:
   pip install graphviz
   Descargar software desde: https://graphviz.org/download/
             """)
@@ -55,48 +56,48 @@ Graficación requiere Graphviz instalado:
         parser.add_argument('archivo', help='Archivo del autómata (JSON o texto)')
 
         parser.add_argument('directorio_salida', nargs='?', default='resultados',
-                           help='Directorio de salida para los resultados (default: resultados)')
+                            help='Directorio de salida para los resultados (por defecto: resultados)')
 
         # Opciones principales
         parser.add_argument('-o', '--output', metavar='DIR',
-                           help='Directorio de salida para los resultados (sobrescribe el posicional)')
+                            help='Directorio de salida para los resultados (sobrescribe el posicional)')
 
         # Opciones de procesamiento
         grupo_procesamiento = parser.add_mutually_exclusive_group()
         grupo_procesamiento.add_argument('-c', '--convertir', action='store_true',
-                                       help='Solo convertir AFND a AFD (sin minimizar)')
+                                         help='Solo convertir AFND a AFD (sin minimizar)')
 
         grupo_procesamiento.add_argument('-m', '--minimizar', action='store_true',
-                                       help='Solo minimización AFD (el archivo debe ser un AFD)')
+                                         help='Solo minimizar el AFD (el archivo debe ser un AFD)')
 
         grupo_procesamiento.add_argument('-v', '--validar', action='store_true',
-                                       help='Modo interactivo para validar cadenas')
+                                         help='Modo interactivo para validar cadenas')
 
         grupo_procesamiento.add_argument('-s', '--string', metavar='CADENA',
-                                       help='Validar una cadena específica')
+                                         help='Validar una cadena específica')
 
         grupo_procesamiento.add_argument('--validar-archivo', metavar='ARCHIVO_JSON',
-                                       help='Validar múltiples cadenas desde archivo JSON con el autómata especificado')
+                                         help='Validar múltiples cadenas desde un archivo JSON con el autómata especificado')
 
         # Opciones de graficación
         parser.add_argument('-g', '--graficar', action='store_true',
-                           help='Generar gráficos del autómata y proceso')
+                            help='Generar gráficos del autómata y del proceso')
 
         parser.add_argument('--solo-graficar', action='store_true',
-                           help='Solo generar gráficos, sin procesamiento')
+                            help='Solo grafica el autómata proporcionado, sin procesamiento adicional')
 
         parser.add_argument('-f', '--formatos', default='png',
-                           help='Formatos de gráficos separados por comas (png,pdf,svg) (default: png)')
+                            help='Formatos de gráficos separados por comas (png,pdf,svg) (por defecto: png)')
 
         # Opciones de utilidad
         parser.add_argument('--verificar-graphviz', action='store_true',
-                           help='Verificar instalación de Graphviz y salir')
+                            help='Verificar la instalación de Graphviz y salir')
 
         parser.add_argument('-r', '--no-reportes', action='store_true',
-                           help='No generar reportes detallados')
+                            help='No generar reportes detallados')
 
         parser.add_argument('--verbose', action='store_true',
-                           help='Mostrar información detallada del proceso')
+                            help='Mostrar información detallada del proceso')
 
         parser.add_argument('--version', action='version', version='Procesador de Autómatas 2.0')
 
@@ -180,4 +181,5 @@ Graficación requiere Graphviz instalado:
         formatos_validos = ['png', 'pdf', 'svg', 'eps', 'ps']
         for formato in formatos:
             if formato not in formatos_validos:
-                print(f"⚠️ Advertencia: Formato '{formato}' no reconocido. Formatos válidos: {', '.join(formatos_validos)}")
+                print(
+                    f"⚠️ Advertencia: Formato '{formato}' no reconocido. Formatos válidos: {', '.join(formatos_validos)}")
