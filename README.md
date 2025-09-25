@@ -29,7 +29,8 @@ Este proyecto implementa algoritmos para:
 │   │   ├── cli.py           # Interfaz de línea de comandos
 │   │   └── ui.py            # Interfaz de usuario
 │   └── utils/
-│       └── logger.py        # Sistema de logging con iconos
+│       ├── logger.py        # Sistema de logging con iconos
+│       └── equivalencia.py  # Verificación formal de equivalencia de autómatas
 ├── ejemplos/                # Archivos de ejemplo
 ├── tests/                   # Casos de prueba
 ├── resultados/             # Directorio de salida (generado automáticamente)
@@ -92,7 +93,10 @@ python main.py <archivo> [directorio_salida] [opciones]
 
 ---
 
-#### Ejemplos de uso
+#### Ejemplos de uso y archivos de ejemplo
+
+Se proporcionan múltiples ejemplos de autómatas en la carpeta `ejemplos/`, basados en los trabajos prácticos de la
+cátedra.
 
 ```bash
 # Procesamiento completo (conversión + minimización)
@@ -513,3 +517,12 @@ equivalente al original. Esta verificación se realiza de forma interna y se inf
 
 Esta validación automática garantiza que las operaciones de conversión y minimización no alteran el lenguaje aceptado
 por el autómata, brindando seguridad y robustez al proceso.
+
+---
+
+### Notas sobre el validador interactivo
+
+- El validador interactivo permite probar cadenas contra el autómata de forma sencilla y rápida.
+- Al escribir "salir" en el modo interactivo de validación de cadenas, se vuelve al menú de selección de autómata; solo
+  Ctrl+C finaliza el programa.
+

@@ -1,13 +1,19 @@
 """
 Módulo para minimizar Autómatas Finitos Deterministas (AFD) utilizando
 el algoritmo de partición de estados equivalentes.
+
+Permite reducir el número de estados de un AFD manteniendo el mismo lenguaje aceptado.
+Incluye métodos para obtener el historial del proceso y las particiones generadas.
 """
 
 from .automata import AFD
 
 
 class MinimizadorAFD:
-    """Clase para minimizar AFD usando el algoritmo de partición."""
+    """
+    Clase para minimizar AFD usando el algoritmo de partición.
+    Permite obtener el AFD mínimo equivalente y el historial del proceso de minimización.
+    """
 
     def __init__(self):
         self.historial_minimizacion = []
@@ -15,13 +21,14 @@ class MinimizadorAFD:
 
     def minimizar(self, afd):
         """
-        Minimiza un AFD utilizando el algoritmo de partición.
+        Minimiza un AFD utilizando el algoritmo de partición de estados equivalentes.
 
         Args:
-            afd: AFD a minimizar
-
+            afd (AFD): Autómata finito determinista a minimizar.
         Returns:
-            AFD: AFD minimizado equivalente
+            AFD: AFD minimizado equivalente.
+        Raises:
+            ValueError: Si el input no es un AFD.
         """
         if not isinstance(afd, AFD):
             raise ValueError("El input debe ser un AFD")
@@ -34,7 +41,8 @@ class MinimizadorAFD:
         estados_alcanzables = afd.obtener_estados_alcanzables()
         afd_sin_inalcanzables = self._eliminar_estados_inalcanzables(afd, estados_alcanzables)
 
-        self.historial_minimizacion.append(f"Estados inalcanzables eliminados: {len(afd.estados) - len(estados_alcanzables)}")
+        self.historial_minimizacion.append(
+            f"Estados inalcanzables eliminados: {len(afd.estados) - len(estados_alcanzables)}")
 
         # Paso 2: Partición inicial (finales vs no finales)
         estados_finales = set(afd_sin_inalcanzables.estados_finales)
@@ -74,7 +82,9 @@ class MinimizadorAFD:
         return afd_minimizado
 
     def _eliminar_estados_inalcanzables(self, afd, estados_alcanzables):
-        """Elimina estados inalcanzables del AFD."""
+        """
+        Elimina estados inalcanzables del AFD, retornando un nuevo AFD solo con los alcanzables.
+        """
         if len(estados_alcanzables) == len(afd.estados):
             return afd  # No hay estados inalcanzables
 
@@ -97,7 +107,7 @@ class MinimizadorAFD:
 
     def _refinar_particion(self, afd, particion_actual):
         """
-        Refina una partición dividiendo grupos que no son equivalentes.
+        Refina una partición dividiendo grupos de estados que no son equivalentes.
 
         Args:
             afd: AFD a analizar
@@ -116,7 +126,7 @@ class MinimizadorAFD:
 
     def _dividir_grupo(self, afd, grupo, particion_actual):
         """
-        Divide un grupo de estados si no todos son equivalentes.
+        Divide un grupo de estados según la firma de sus transiciones.
 
         Args:
             afd: AFD a analizar
@@ -152,7 +162,9 @@ class MinimizadorAFD:
         return list(firmas.values())
 
     def _encontrar_grupo_de_estado(self, estado, particion):
-        """Encuentra el índice del grupo al que pertenece un estado."""
+        """
+        Devuelve el índice del grupo de la partición al que pertenece el estado.
+        """
         for i, grupo in enumerate(particion):
             if estado in grupo:
                 return i
@@ -283,7 +295,7 @@ class MinimizadorAFD:
         tabla.append(separador)
         linea_encabezado = f"| {encabezado[0]:^{ancho_estado}} "
         for i, simbolo in enumerate(alfabeto_ordenado):
-            linea_encabezado += f"| {encabezado[i+1]:^{anchos_simbolos[i]}} "
+            linea_encabezado += f"| {encabezado[i + 1]:^{anchos_simbolos[i]}} "
         linea_encabezado += f"| {'F':^{ancho_final}} |"
         tabla.append(linea_encabezado)
         tabla.append(separador)

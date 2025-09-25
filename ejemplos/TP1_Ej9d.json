@@ -1,0 +1,18 @@
+{
+  "estados": ["S0", "S1", "S2", "S3", "S4"],
+  "alfabeto": ["A", "B"],
+  "estado_inicial": "S0",
+  "estados_finales": ["S0", "S3"],
+  "transiciones": [
+    {"origen": "S0", "simbolo": "A", "destino": "S1"},
+    {"origen": "S0", "simbolo": "B", "destino": "S2"},
+    {"origen": "S1", "simbolo": "A", "destino": "S1"},
+    {"origen": "S1", "simbolo": "A", "destino": "S3"},
+    {"origen": "S2", "simbolo": "A", "destino": "S2"},
+    {"origen": "S2", "simbolo": "A", "destino": "S3"},
+    {"origen": "S3", "simbolo": "A", "destino": "S3"},
+    {"origen": "S3", "simbolo": "B", "destino": "S4"},
+    {"origen": "S4", "simbolo": "A", "destino": "S3"}
+  ],
+  "descripcion": "AFND del ejercicio 9d del TP1."
+}

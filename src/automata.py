@@ -1,13 +1,19 @@
 """
 Módulo para la representación de autómatas finitos.
 
-Este módulo contiene las clases necesarias para representar:
-- Autómatas Finitos Deterministas (AFD)
-- Autómatas Finitos No Deterministas (AFND)
+Contiene las clases base y derivadas para modelar autómatas finitos deterministas (AFD) y no deterministas (AFND),
+con métodos para validar cadenas, calcular clausura epsilon y obtener estados alcanzables.
 """
 
+
 class Estado:
-    """Representa un estado del autómata."""
+    """
+    Representa un estado de un autómata finito.
+
+    Atributos:
+        nombre (str): Nombre identificador del estado.
+        es_final (bool): Indica si el estado es final.
+    """
 
     def __init__(self, nombre, es_final=False):
         self.nombre = nombre
@@ -29,7 +35,17 @@ class Estado:
 
 
 class Automata:
-    """Clase base para representar un autómata finito."""
+    """
+    Clase base abstracta para autómatas finitos.
+
+    Atributos:
+        estados (set): Conjunto de nombres de estados.
+        alfabeto (set): Conjunto de símbolos del alfabeto.
+        estado_inicial (str): Estado inicial.
+        estados_finales (set): Conjunto de estados finales.
+        transiciones (dict): Función de transición.
+        descripcion (str): Descripción opcional del autómata.
+    """
 
     def __init__(self, estados, alfabeto, estado_inicial, estados_finales, transiciones, descripcion=None):
         """
@@ -55,7 +71,9 @@ class Automata:
         raise NotImplementedError("Debe implementarse en las clases derivadas")
 
     def obtener_estados_alcanzables(self):
-        """Retorna el conjunto de estados alcanzables desde el estado inicial."""
+        """
+        Retorna el conjunto de estados alcanzables desde el estado inicial recorriendo todas las transiciones.
+        """
         alcanzables = set()
         por_visitar = [self.estado_inicial]
 
@@ -83,7 +101,10 @@ class Automata:
 
 
 class AFD(Automata):
-    """Autómata Finito Determinista."""
+    """
+    Autómata Finito Determinista (AFD).
+    Implementa la validación de cadenas de manera determinista.
+    """
 
     def validar_cadena(self, cadena):
         """
@@ -110,7 +131,10 @@ class AFD(Automata):
 
 
 class AFND(Automata):
-    """Autómata Finito No Determinista."""
+    """
+    Autómata Finito No Determinista (AFND).
+    Permite transiciones múltiples y transiciones epsilon.
+    """
 
     def validar_cadena(self, cadena):
         """
@@ -149,7 +173,8 @@ class AFND(Automata):
 
     def clausura_epsilon(self, estados):
         """
-        Calcula la clausura-ε de un conjunto de estados.
+        Calcula la clausura-ε (epsilon) de un conjunto de estados, es decir, todos los estados alcanzables
+        mediante transiciones vacías desde los estados dados.
 
         Args:
             estados: conjunto de estados

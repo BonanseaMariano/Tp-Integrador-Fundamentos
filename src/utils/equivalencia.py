@@ -1,19 +1,19 @@
-def son_afd_equivalentes(afd1, afd2):
-    """
-    Compara dos AFD minimizados para verificar si son equivalentes estructuralmente.
-    Retorna True si son equivalentes, False en caso contrario.
-    """
-    return (
-            set(afd1.estados) == set(afd2.estados) and
-            set(afd1.alfabeto) == set(afd2.alfabeto) and
-            afd1.estado_inicial == afd2.estado_inicial and
-            set(afd1.estados_finales) == set(afd2.estados_finales) and
-            afd1.transiciones == afd2.transiciones
-    )
+"""
+Módulo de equivalencia de autómatas finitos deterministas (AFD).
+
+Proporciona funciones para verificar si dos AFD son equivalentes utilizando el método del autómata producto.
+"""
 
 
 def _hashable_state(state):
-    # Convierte un set a frozenset si es necesario, si no lo deja igual
+    """
+    Convierte un conjunto de estados en un frozenset para hacerlo hasheable.
+    Si el estado ya es hasheable, lo retorna igual.
+    Args:
+        state: Estado o conjunto de estados.
+    Returns:
+        Estado hasheable (frozenset o el mismo valor).
+    """
     if isinstance(state, set):
         return frozenset(state)
     return state
@@ -21,8 +21,13 @@ def _hashable_state(state):
 
 def equivalencia_afd_producto(afd1, afd2):
     """
-    Verifica equivalencia de dos AFD usando el método del autómata producto.
+    Verifica la equivalencia de dos AFD usando el método del autómata producto.
     Retorna True si son equivalentes, False si existe alguna cadena que distingue ambos lenguajes.
+    Args:
+        afd1: Primer autómata finito determinista.
+        afd2: Segundo autómata finito determinista.
+    Returns:
+        bool: True si los lenguajes aceptados son equivalentes, False en caso contrario.
     """
     if set(afd1.alfabeto) != set(afd2.alfabeto):
         return False  # No pueden ser equivalentes si el alfabeto difiere

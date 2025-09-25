@@ -1,10 +1,13 @@
 """
 Módulo para generar gráficos de autómatas finitos usando Graphviz.
-Permite visualizar AFD y AFND con diferentes estilos y opciones.
+
+Permite visualizar AFD y AFND con diferentes estilos y opciones de configuración.
+Incluye métodos para graficar autómatas individuales, comparaciones y procesos de minimización.
 """
 
 try:
     import graphviz
+
     GRAPHVIZ_DISPONIBLE = True
 except ImportError:
     GRAPHVIZ_DISPONIBLE = False
@@ -14,7 +17,10 @@ from .automata import AFD, AFND
 
 
 class GraficadorAutomatas:
-    """Clase para generar visualizaciones de autómatas finitos."""
+    """
+    Clase para generar visualizaciones de autómatas finitos (AFD y AFND) usando Graphviz.
+    Permite personalizar estilos, exportar en varios formatos y comparar autómatas.
+    """
 
     def __init__(self):
         if not GRAPHVIZ_DISPONIBLE:
@@ -61,32 +67,31 @@ class GraficadorAutomatas:
 
     def configurar_estilo(self, **kwargs):
         """
-        Configura el estilo de los gráficos.
+        Configura el estilo de los gráficos generados.
 
         Args:
-            formato: formato de salida ('png', 'pdf', 'svg', etc.)
-            motor: motor de renderizado ('dot', 'neato', 'circo', etc.)
-            dpi: resolución en DPI
-            color_nodo_normal: color de nodos normales
-            color_nodo_inicial: color del nodo inicial
-            color_nodo_final: color de nodos finales
-            color_nodo_inicial_final: color si es inicial y final
-            **kwargs: otros parámetros de configuración
+            formato (str): Formato de salida ('png', 'pdf', 'svg', etc.).
+            motor (str): Motor de renderizado ('dot', 'neato', etc.).
+            dpi (str): Resolución en DPI.
+            color_nodo_normal (str): Color de nodos normales.
+            color_nodo_inicial (str): Color del nodo inicial.
+            color_nodo_final (str): Color de nodos finales.
+            color_nodo_inicial_final (str): Color si es inicial y final.
+            ...otros parámetros de configuración.
         """
         self.configuracion.update(kwargs)
 
     def generar_grafico(self, automata, nombre_archivo, directorio="", incluir_titulo=True):
         """
-        Genera un gráfico del autómata especificado.
+        Genera un gráfico visual del autómata especificado y lo guarda en el formato elegido.
 
         Args:
-            automata: AFD o AFND a graficar
-            nombre_archivo: nombre del archivo (sin extensión)
-            directorio: directorio donde guardar (vacío = directorio actual)
-            incluir_titulo: si incluir título en el gráfico
-
+            automata: AFD o AFND a graficar.
+            nombre_archivo (str): Nombre base del archivo de salida.
+            directorio (str): Carpeta donde guardar el archivo.
+            incluir_titulo (bool): Si se incluye un título en el gráfico.
         Returns:
-            str: ruta del archivo generado
+            str: Ruta del archivo generado.
         """
         if not GRAPHVIZ_DISPONIBLE:
             raise ImportError("Graphviz no está disponible")
@@ -112,19 +117,19 @@ class GraficadorAutomatas:
 
         # Configuración de nodos por defecto
         dot.attr('node',
-                shape='circle',
-                style='filled',
-                fontname=self.configuracion['fuente'],
-                fontsize=self.configuracion['tamaño_fuente'],
-                width=self.configuracion['tamaño_nodo'],
-                height=self.configuracion['tamaño_nodo'])
+                 shape='circle',
+                 style='filled',
+                 fontname=self.configuracion['fuente'],
+                 fontsize=self.configuracion['tamaño_fuente'],
+                 width=self.configuracion['tamaño_nodo'],
+                 height=self.configuracion['tamaño_nodo'])
 
         # Configuración de transiciones por defecto
         dot.attr('edge',
-                fontname=self.configuracion['fuente'],
-                fontsize=str(int(self.configuracion['tamaño_fuente']) - 2),
-                color=self.configuracion['color_transicion'],
-                penwidth=self.configuracion['grosor_transicion'])
+                 fontname=self.configuracion['fuente'],
+                 fontsize=str(int(self.configuracion['tamaño_fuente']) - 2),
+                 color=self.configuracion['color_transicion'],
+                 penwidth=self.configuracion['grosor_transicion'])
 
         # Título del gráfico
         if incluir_titulo:
@@ -175,8 +180,8 @@ class GraficadorAutomatas:
         return archivo_generado
 
     def generar_comparacion(self, automata_original, automata_procesado,
-                          nombre_archivo, directorio="",
-                          titulo_original="Original", titulo_procesado="Procesado"):
+                            nombre_archivo, directorio="",
+                            titulo_original="Original", titulo_procesado="Procesado"):
         """
         Genera un gráfico comparativo de dos autómatas lado a lado.
 
@@ -224,7 +229,7 @@ class GraficadorAutomatas:
         return archivo_generado
 
     def generar_proceso_minimizacion(self, minimizador, automata_original, automata_minimizado,
-                                   nombre_archivo, directorio=""):
+                                     nombre_archivo, directorio=""):
         """
         Genera un gráfico que muestra el proceso de minimización paso a paso.
 
@@ -261,7 +266,7 @@ class GraficadorAutomatas:
 
         if hasattr(minimizador, 'historial_minimizacion'):
             for i, paso in enumerate(minimizador.historial_minimizacion[:5]):  # Limitar a 5 pasos
-                info_nodos.append(f"Paso {i+1}: {paso}")
+                info_nodos.append(f"Paso {i + 1}: {paso}")
 
         # Crear tabla con información
         tabla_html = '<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
@@ -326,15 +331,15 @@ class GraficadorAutomatas:
         """
         # Configurar subgráfico
         subgrafico.attr('node',
-                       shape='circle',
-                       style='filled',
-                       fontname=self.configuracion['fuente'],
-                       fontsize=self.configuracion['tamaño_fuente'],
-                       width=self.configuracion['tamaño_nodo'])
+                        shape='circle',
+                        style='filled',
+                        fontname=self.configuracion['fuente'],
+                        fontsize=self.configuracion['tamaño_fuente'],
+                        width=self.configuracion['tamaño_nodo'])
 
         subgrafico.attr('edge',
-                       fontname=self.configuracion['fuente'],
-                       fontsize=str(int(self.configuracion['tamaño_fuente']) - 2))
+                        fontname=self.configuracion['fuente'],
+                        fontsize=str(int(self.configuracion['tamaño_fuente']) - 2))
 
         # Nodo de inicio
         subgrafico.node(f'{prefijo}__start', '', shape='none', width='0', height='0')
@@ -357,7 +362,7 @@ class GraficadorAutomatas:
             forma = 'doublecircle' if es_final else 'circle'
 
             subgrafico.node(f'{prefijo}{estado}', str(estado),
-                          shape=forma, fillcolor=color)
+                            shape=forma, fillcolor=color)
 
         # Flecha inicial
         subgrafico.edge(f'{prefijo}__start', f'{prefijo}{automata.estado_inicial}')
@@ -370,7 +375,7 @@ class GraficadorAutomatas:
             subgrafico.edge(f'{prefijo}{origen}', f'{prefijo}{destino}', label=etiqueta)
 
     def exportar_multiples_formatos(self, automata, nombre_base, directorio="",
-                                   formatos=['png', 'pdf', 'svg']):
+                                    formatos=['png', 'pdf', 'svg']):
         """
         Exporta el mismo autómata en múltiples formatos.
 
@@ -390,7 +395,7 @@ class GraficadorAutomatas:
             self.configuracion['formato'] = formato
             try:
                 archivo = self.generar_grafico(automata, f"{nombre_base}_{formato}",
-                                             directorio, incluir_titulo=True)
+                                               directorio, incluir_titulo=True)
                 archivos_generados.append(archivo)
             except Exception as e:
                 print(f"⚠️ Error generando formato {formato}: {e}")

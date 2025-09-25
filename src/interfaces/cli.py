@@ -1,5 +1,7 @@
 """
 Interfaz de línea de comandos para el procesador de autómatas.
+
+Permite ejecutar las operaciones principales del sistema desde la terminal, procesando argumentos y opciones para conversión, minimización, validación y graficación de autómatas.
 """
 
 import argparse
@@ -16,9 +18,12 @@ except ImportError:
 
 
 class InterfazLineaComandos:
-    """Maneja la interfaz de línea de comandos y argumentos."""
+    """
+    Maneja la interfaz de línea de comandos y argumentos para el procesador de autómatas.
+    """
 
     def __init__(self):
+        """Inicializa el parser de argumentos."""
         self.parser = self._crear_parser()
 
     def parse_args(self, args=None):
@@ -26,7 +31,9 @@ class InterfazLineaComandos:
         return self.parser.parse_args(args)
 
     def _crear_parser(self):
-        """Crea el parser de argumentos de línea de comandos."""
+        """
+        Crea el parser de argumentos de línea de comandos con todas las opciones y ejemplos de uso.
+        """
         parser = argparse.ArgumentParser(
             description="Procesador de Autómatas Finitos - Conversión AFND→AFD, Minimización y Graficación",
             formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -104,7 +111,9 @@ La graficación requiere tener Graphviz instalado:
         return parser
 
     def verificar_graphviz(self):
-        """Verifica la instalación de Graphviz."""
+        """
+        Verifica la instalación de Graphviz y muestra el estado en consola.
+        """
         if GRAFICACION_DISPONIBLE:
             info = verificar_instalacion()
             print("Estado de Graphviz:")
@@ -118,7 +127,9 @@ La graficación requiere tener Graphviz instalado:
         return 0
 
     def ejecutar_operacion(self, args, procesador, ui):
-        """Ejecuta la operación correspondiente según los argumentos."""
+        """
+        Ejecuta la operación correspondiente según los argumentos de línea de comandos.
+        """
         # Determinar directorio de salida
         directorio_salida = args.output or args.directorio_salida
         generar_reportes = not args.no_reportes

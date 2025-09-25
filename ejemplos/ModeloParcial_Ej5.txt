@@ -1,0 +1,20 @@
+ESTADOS: S1,S2,S3,S4,S5,S6
+ALFABETO: a,b
+ESTADO_INICIAL: S1
+ESTADOS_FINALES: S1,S5
+DESCRIPCION: AFND del ejercicio 5 del modelo parcial.
+TRANSICIONES:
+S1,a,S2
+S1,a,S3
+S1,a,S5
+S1,b,S6
+S2,a,S6
+S2,b,S1
+S3,a,S4
+S3,b,S6
+S4,a,S6
+S4,b,S1
+S5,a,S5
+S5,b,S6
+S6,a,S6
+S6,b,S6

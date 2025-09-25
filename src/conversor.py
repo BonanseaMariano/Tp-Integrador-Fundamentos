@@ -1,5 +1,9 @@
 """
 Módulo para convertir AFND a AFD.
+
+Implementa el algoritmo de subconjuntos para transformar un autómata finito no determinista (AFND)
+en un autómata finito determinista (AFD) equivalente, optimizando la tabla de transiciones y eliminando
+estados inútiles.
 """
 
 from .automata import AFD, AFND
@@ -8,6 +12,7 @@ from .automata import AFD, AFND
 class ConversorTabular:
     """
     Conversor AFND → AFD que opera directamente sobre tablas de transiciones.
+    Permite convertir un autómata no determinista en uno determinista equivalente, siguiendo el algoritmo de subconjuntos.
     """
 
     def __init__(self):
@@ -19,13 +24,14 @@ class ConversorTabular:
 
     def convertir(self, afnd):
         """
-        Convierte AFND a AFD usando representación tabular.
+        Convierte un AFND a un AFD equivalente usando el algoritmo tabular.
 
         Args:
-            afnd: AFND a convertir
-
+            afnd (AFND): Autómata finito no determinista a convertir.
         Returns:
-            AFD: AFD equivalente
+            AFD: Autómata finito determinista equivalente.
+        Raises:
+            ValueError: Si el input no es un AFND.
         """
         if not isinstance(afnd, AFND):
             raise ValueError("El input debe ser un AFND")
@@ -50,7 +56,10 @@ class ConversorTabular:
         return self._construir_afd_desde_tabla(afnd)
 
     def _construir_tabla_afnd(self, afnd):
-        """Construye la representación tabular del AFND eliminando estados inútiles."""
+        """
+        Construye la tabla de transiciones del AFND, eliminando estados sumidero e inalcanzables.
+        Solo se consideran estados que pueden alcanzar algún estado final.
+        """
         self.historial.append("=== TABLA DE TRANSICIONES ORIGINAL SIN ESTADOS SUMIDERO ===")
 
         # Paso 1: Identificar estados que pueden alcanzar estados finales
@@ -92,7 +101,10 @@ class ConversorTabular:
             self.historial.append(f"Estados sumidero eliminados desde el AFND: {sorted(estados_inutiles)}")
 
     def _generar_tabla_afd(self, afnd):
-        """Genera la tabla del AFD usando el algoritmo de construcción de subconjuntos."""
+        """
+        Genera la tabla de transiciones del AFD usando el algoritmo de subconjuntos.
+        Cada conjunto de estados del AFND se representa como un estado del AFD.
+        """
         self.historial.append("\n=== GENERACIÓN DE TABLA AFD ===")
 
         # Estado inicial: clausura epsilon del estado inicial del AFND

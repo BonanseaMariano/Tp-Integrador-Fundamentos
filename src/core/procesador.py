@@ -1,6 +1,8 @@
 """
 Procesador central para autómatas finitos.
-Maneja la conversión, minimización y graficación de autómatas.
+
+Este módulo orquesta la conversión, minimización, validación y graficación de autómatas,
+coordinando los distintos componentes del sistema y gestionando la entrada/salida de archivos.
 """
 
 from pathlib import Path
@@ -21,15 +23,37 @@ try:
 except ImportError:
     GRAFICACION_DISPONIBLE = False
 
+
+    class GraficadorAutomatas:
+        def exportar_multiples_formatos(self, *args, **kwargs):
+            return []
+
+        def generar_comparacion(self, *args, **kwargs):
+            return None
+
+
+    def verificar_instalacion():
+        return {'libreria_instalada': False, 'ejecutable_disponible': False, 'version': None,
+                'mensaje': 'No disponible'}
+
 from src.utils.logger import Logger, Iconos
 
 
 class ProcesadorAutomatas:
-    """Procesador principal para operaciones con autómatas."""
+    """
+    Procesador principal para operaciones con autómatas finitos.
+    Se encarga de la conversión AFND→AFD, minimización, validación de equivalencia y graficación.
+    """
 
     def __init__(self, logger: Logger):
+        """
+        Inicializa el procesador con los componentes necesarios.
+
+        Args:
+            logger (Logger): Instancia de logger para mensajes.
+        """
         self.logger = logger
-        self.conversor = ConversorTabular()  # Ahora usa el conversor tabular como predeterminado
+        self.conversor = ConversorTabular()  # Usa el conversor tabular como predeterminado
         self.minimizador = MinimizadorAFD()
         self.manejador_archivos = ManejadorArchivos()
         self._graficador = None
@@ -37,16 +61,15 @@ class ProcesadorAutomatas:
     def procesar_completo(self, archivo_entrada: str, directorio_salida: str = "resultados",
                           generar_reportes: bool = True, generar_graficos: bool = False) -> Dict[str, Any]:
         """
-        Procesa un autómata completo: conversión AFND->AFD y minimización.
+        Procesa un autómata completo: conversión AFND→AFD, minimización, validación de equivalencia y generación de reportes/gráficos.
 
         Args:
-            archivo_entrada: Ruta al archivo del autómata
-            directorio_salida: Directorio donde guardar resultados
-            generar_reportes: Si generar reportes detallados
-            generar_graficos: Si generar gráficos del proceso
-
+            archivo_entrada (str): Ruta al archivo del autómata.
+            directorio_salida (str): Directorio donde guardar resultados.
+            generar_reportes (bool): Si generar reportes detallados.
+            generar_graficos (bool): Si generar gráficos del proceso.
         Returns:
-            Diccionario con los autómatas en cada etapa
+            dict: Diccionario con los autómatas en cada etapa y resultados intermedios.
         """
         self.logger.separador("PROCESADOR DE AUTÓMATAS FINITOS")
         self.logger.info(f"Cargando autómata desde: {archivo_entrada}", Iconos.CARGANDO)
@@ -106,7 +129,17 @@ class ProcesadorAutomatas:
 
     def convertir_solo(self, archivo_entrada: str, directorio_salida: str = "resultados",
                        generar_reporte: bool = True) -> Optional[AFD]:
-        """Solo convierte AFND a AFD sin minimizar."""
+        """
+        Solo convierte AFND a AFD sin minimizar.
+
+        Args:
+            archivo_entrada (str): Ruta al archivo del autómata.
+            directorio_salida (str): Directorio donde guardar resultados.
+            generar_reporte (bool): Si generar reporte de la conversión.
+
+        Returns:
+            AFD convertido o None si falla.
+        """
         self.logger.separador("CONVERSIÓN AFND → AFD")
         self.logger.info(f"Cargando AFND desde: {archivo_entrada}", Iconos.CARGANDO)
 
@@ -136,7 +169,17 @@ class ProcesadorAutomatas:
 
     def minimizar_solo(self, archivo_entrada: str, directorio_salida: str = "resultados",
                        generar_reporte: bool = True) -> Optional[AFD]:
-        """Solo minimiza un AFD sin conversión previa."""
+        """
+        Solo minimiza un AFD sin conversión previa.
+
+        Args:
+            archivo_entrada (str): Ruta al archivo del autómata.
+            directorio_salida (str): Directorio donde guardar resultados.
+            generar_reporte (bool): Si generar reporte de la minimización.
+
+        Returns:
+            AFD minimizado o None si falla.
+        """
         self.logger.separador("MINIMIZACIÓN DE AFD")
         self.logger.info(f"Cargando AFD desde: {archivo_entrada}", Iconos.CARGANDO)
 
@@ -144,44 +187,30 @@ class ProcesadorAutomatas:
             automata_original = self._cargar_automata(archivo_entrada)
 
             if isinstance(automata_original, AFND):
-                self.logger.info("El autómata es no determinista, convirtiendo a AFD antes de minimizar...",
-                                 Iconos.CONVERSION)
-                from src.conversor import ConversorTabular
-                conversor = ConversorTabular()
-                automata_original = conversor.convertir(automata_original)
-                self.logger.success("Conversión a AFD completada", Iconos.AFD)
-
-            if isinstance(automata_original, AFND):
-                self.logger.error("Para minimizar, primero debe convertir el AFND a AFD")
-                self.logger.info("Use la opción -c para convertir primero, o use la opción completa sin parámetros")
+                self.logger.warning("El archivo no corresponde a un AFD. No se puede minimizar.")
                 return None
 
             self.logger.info(f"AFD cargado: {len(automata_original.estados)} estados", Iconos.AFD)
 
-            # Minimización
-            self.logger.info("Ejecutando algoritmo de partición...", Iconos.PROCESANDO)
-            afd_minimizado = self.minimizador.minimizar(automata_original)
-            self.logger.success(f"Minimización completada: {len(afd_minimizado.estados)} estados", Iconos.MINIMIZADO)
+            self.logger.info("Ejecutando algoritmo de minimización...", Iconos.PROCESANDO)
+            afd_min = self.minimizador.minimizar(automata_original)
+            self.logger.success(f"Minimización completada: {len(afd_min.estados)} estados", Iconos.MINIMIZADO)
 
-            # Mostrar estadísticas de reducción
-            reduccion = len(automata_original.estados) - len(afd_minimizado.estados)
-            porcentaje = (reduccion / len(automata_original.estados)) * 100 if len(automata_original.estados) > 0 else 0
-            self.logger.info(f"Reducción: {reduccion} estados ({porcentaje:.1f}%)", Iconos.REDUCCION)
-
-            # Guardar resultado
             if directorio_salida:
-                self._guardar_minimizacion(automata_original, afd_minimizado, archivo_entrada, directorio_salida,
+                self._guardar_minimizacion(automata_original, afd_min, archivo_entrada, directorio_salida,
                                            generar_reporte)
 
-            return afd_minimizado
+            return afd_min
 
         except Exception as e:
             self.logger.error(f"Error durante la minimización: {e}")
             return None
 
     def graficar_solo(self, archivo_entrada: str, directorio_salida: str = "graficos",
-                      formatos: list = ['png']) -> bool:
+                      formatos: list = None) -> bool:
         """Genera solo gráficos de un autómata sin procesamiento adicional."""
+        if formatos is None:
+            formatos = ['png']
         if not GRAFICACION_DISPONIBLE:
             self.logger.error("Módulo de graficación no disponible. Instale: pip install graphviz")
             return False
@@ -454,7 +483,7 @@ class ProcesadorAutomatas:
         equivalentes = equivalencia_afd_producto(original, minimizado)
         if equivalentes:
             self.logger.success(
-                "Los autómatas son equivalentes (verificación formal por autómata producto)",
+                "Los autómatas son equivalentes",
                 Iconos.COMPLETADO
             )
         else:

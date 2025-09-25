@@ -1,0 +1,23 @@
+{
+  "estados": ["S1", "S2", "S3", "S4", "S5", "S6"],
+  "alfabeto": ["a", "b"],
+  "estado_inicial": "S1",
+  "estados_finales": ["S1", "S5"],
+  "transiciones": [
+    {"origen": "S1", "simbolo": "a", "destino": "S2"},
+    {"origen": "S1", "simbolo": "a", "destino": "S3"},
+    {"origen": "S1", "simbolo": "a", "destino": "S5"},
+    {"origen": "S1", "simbolo": "b", "destino": "S6"},
+    {"origen": "S2", "simbolo": "a", "destino": "S6"},
+    {"origen": "S2", "simbolo": "b", "destino": "S1"},
+    {"origen": "S3", "simbolo": "a", "destino": "S4"},
+    {"origen": "S3", "simbolo": "b", "destino": "S6"},
+    {"origen": "S4", "simbolo": "a", "destino": "S6"},
+    {"origen": "S4", "simbolo": "b", "destino": "S1"},
+    {"origen": "S5", "simbolo": "a", "destino": "S5"},
+    {"origen": "S5", "simbolo": "b", "destino": "S6"},
+    {"origen": "S6", "simbolo": "a", "destino": "S6"},
+    {"origen": "S6", "simbolo": "b", "destino": "S6"}
+  ],
+  "descripcion": "AFND del ejercicio 5 del modelo parcial."
+}

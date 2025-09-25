@@ -2,19 +2,19 @@
   "estados": ["S0", "S1", "S2", "S3", "S4"],
   "alfabeto": ["a", "b"],
   "estado_inicial": "S0",
-  "estados_finales": ["S2"],
+  "estados_finales": ["S3"],
   "transiciones": [
     {"origen": "S0", "simbolo": "a", "destino": "S1"},
-    {"origen": "S0", "simbolo": "a", "destino": "S3"},
     {"origen": "S0", "simbolo": "b", "destino": "S4"},
     {"origen": "S1", "simbolo": "a", "destino": "S1"},
     {"origen": "S1", "simbolo": "b", "destino": "S2"},
-    {"origen": "S2", "simbolo": "a", "destino": "S2"},
-    {"origen": "S2", "simbolo": "b", "destino": "S0"},
-    {"origen": "S3", "simbolo": "a", "destino": "S2"},
-    {"origen": "S3", "simbolo": "b", "destino": "S3"},
+    {"origen": "S2", "simbolo": "a", "destino": "S1"},
+    {"origen": "S2", "simbolo": "a", "destino": "S3"},
+    {"origen": "S2", "simbolo": "b", "destino": "S4"},
+    {"origen": "S3", "simbolo": "a", "destino": "S3"},
+    {"origen": "S3", "simbolo": "b", "destino": "S4"},
     {"origen": "S4", "simbolo": "a", "destino": "S4"},
     {"origen": "S4", "simbolo": "b", "destino": "S4"}
   ],
-  "descripcion": "AFND del ejercicio 9b del TP1"
+  "descripcion": "AFND del ejercicio 9c del TP1."
 }

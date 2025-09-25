@@ -1,6 +1,8 @@
 """
 Módulo para lectura y escritura de archivos de autómatas finitos.
-Soporta formatos JSON y texto plano.
+
+Soporta formatos JSON y texto plano. Permite cargar y guardar autómatas deterministas y no deterministas,
+validando la estructura y consistencia de los datos.
 """
 
 import json
@@ -8,18 +10,22 @@ from .automata import AFD, AFND
 
 
 class ManejadorArchivos:
-    """Clase para manejar la entrada y salida de archivos de autómatas."""
+    """
+    Clase para manejar la entrada y salida de archivos de autómatas.
+    Permite cargar y guardar autómatas en formato JSON o texto plano, validando la estructura y los datos.
+    """
 
     @staticmethod
     def cargar_automata_desde_json(ruta_archivo):
         """
-        Carga un autómata desde un archivo JSON.
+        Carga un autómata desde un archivo JSON, validando su estructura y consistencia.
 
         Args:
-            ruta_archivo: ruta al archivo JSON
-
+            ruta_archivo (str): Ruta al archivo JSON.
         Returns:
-            AFD o AFND: autómata cargado
+            AFD o AFND: Autómata cargado desde el archivo.
+        Raises:
+            FileNotFoundError, PermissionError, ValueError: Si hay errores de acceso o formato.
         """
         try:
             with open(ruta_archivo, 'r', encoding='utf-8') as archivo:
@@ -74,12 +80,12 @@ class ManejadorArchivos:
                 try:
                     # Validar estructura de transición
                     if not isinstance(transicion, dict):
-                        raise ValueError(f"❌ Transición {i+1} debe ser un objeto")
+                        raise ValueError(f"❌ Transición {i + 1} debe ser un objeto")
 
                     campos_transicion = ['origen', 'simbolo', 'destino']
                     for campo in campos_transicion:
                         if campo not in transicion:
-                            raise ValueError(f"❌ Campo '{campo}' faltante en transición {i+1}")
+                            raise ValueError(f"❌ Campo '{campo}' faltante en transición {i + 1}")
 
                     origen = transicion['origen']
                     simbolo = transicion['simbolo']
@@ -87,11 +93,12 @@ class ManejadorArchivos:
 
                     # Validar que origen esté en el conjunto de estados
                     if origen not in estados:
-                        raise ValueError(f"❌ Estado origen '{origen}' en transición {i+1} no está en el conjunto de estados")
+                        raise ValueError(
+                            f"❌ Estado origen '{origen}' en transición {i + 1} no está en el conjunto de estados")
 
                     # Validar que símbolo esté en el alfabeto (excepto epsilon)
                     if simbolo != '' and simbolo not in alfabeto:
-                        raise ValueError(f"❌ Símbolo '{simbolo}' en transición {i+1} no está en el alfabeto")
+                        raise ValueError(f"❌ Símbolo '{simbolo}' en transición {i + 1} no está en el alfabeto")
 
                     # Crear clave para la transición
                     clave = (origen, simbolo)
@@ -99,10 +106,11 @@ class ManejadorArchivos:
                     # Validar destinos
                     if isinstance(destino, list):
                         if not destino:
-                            raise ValueError(f"❌ Lista de destinos vacía en transición {i+1}")
+                            raise ValueError(f"❌ Lista de destinos vacía en transición {i + 1}")
                         for dest in destino:
                             if dest not in estados:
-                                raise ValueError(f"❌ Estado destino '{dest}' en transición {i+1} no está en el conjunto de estados")
+                                raise ValueError(
+                                    f"❌ Estado destino '{dest}' en transición {i + 1} no está en el conjunto de estados")
 
                         # Si ya existe la transición, agregar los destinos al conjunto existente
                         if clave in transiciones:
@@ -115,7 +123,8 @@ class ManejadorArchivos:
                             transiciones[clave] = set(destino)
                     else:
                         if destino not in estados:
-                            raise ValueError(f"❌ Estado destino '{destino}' en transición {i+1} no está en el conjunto de estados")
+                            raise ValueError(
+                                f"❌ Estado destino '{destino}' en transición {i + 1} no está en el conjunto de estados")
 
                         # Si ya existe la transición, convertir a conjunto y agregar el nuevo destino
                         if clave in transiciones:
@@ -128,7 +137,7 @@ class ManejadorArchivos:
                             transiciones[clave] = destino
 
                 except Exception as e:
-                    raise ValueError(f"❌ Error en transición {i+1}: {e}")
+                    raise ValueError(f"❌ Error en transición {i + 1}: {e}")
 
             # Determinar si es AFD o AFND
             es_afnd = any(isinstance(destino, set) for destino in transiciones.values())
@@ -148,12 +157,12 @@ class ManejadorArchivos:
     @staticmethod
     def guardar_automata_como_json(automata, ruta_archivo, incluir_metadatos=True):
         """
-        Guarda un autómata en formato JSON.
+        Guarda un autómata en formato JSON, permitiendo incluir metadatos opcionales.
 
         Args:
-            automata: AFD o AFND a guardar
-            ruta_archivo: ruta donde guardar el archivo
-            incluir_metadatos: si incluir información adicional
+            automata: AFD o AFND a guardar.
+            ruta_archivo (str): Ruta donde guardar el archivo.
+            incluir_metadatos (bool): Si incluir información adicional.
         """
         try:
             # Preparar transiciones para JSON
@@ -241,7 +250,8 @@ class ManejadorArchivos:
                 if seccion_transiciones:
                     # Procesar transición: origen,simbolo,destino(s)
                     if ',' not in linea:
-                        raise ValueError(f"❌ Formato inválido en transición línea {numero_linea}: '{linea}'. Formato esperado: origen,simbolo,destino")
+                        raise ValueError(
+                            f"❌ Formato inválido en transición línea {numero_linea}: '{linea}'. Formato esperado: origen,simbolo,destino")
 
                     partes = linea.split(',')
                     if len(partes) < 3:
@@ -263,7 +273,8 @@ class ManejadorArchivos:
                 else:
                     # Procesar metadatos
                     if ':' not in linea:
-                        raise ValueError(f"❌ Formato inválido en línea {numero_linea}: '{linea}'. Se esperaba formato 'CAMPO: valor'")
+                        raise ValueError(
+                            f"❌ Formato inválido en línea {numero_linea}: '{linea}'. Se esperaba formato 'CAMPO: valor'")
 
                     clave, valor = linea.split(':', 1)
                     clave = clave.strip().upper()

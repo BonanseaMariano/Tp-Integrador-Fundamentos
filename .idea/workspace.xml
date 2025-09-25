@@ -4,12 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9de18ca8-10da-4f78-b6dd-e487d9aa2a8a" name="Changes" comment="Mejora ayuda y ejemplos en README, actualiza mensajes y descripciones en CLI, y agrega archivo de ejemplo TP1_Ej9a.txt">
-      <change afterPath="$PROJECT_DIR$/src/utils/equivalencia.py" afterDir="false" />
+    <list default="true" id="9de18ca8-10da-4f78-b6dd-e487d9aa2a8a" name="Changes" comment="Agrega validación formal de equivalencia de autómatas por autómata producto, mejora mensajes y limpieza de archivos temporales, y documenta el proceso en README">
+      <change afterPath="$PROJECT_DIR$/Tp_Integrador-Bonansea.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ejemplos/TP1_Ej9b.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ejemplos/TP1_Ej9c.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ejemplos/TP1_Ej9c.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ejemplos/TP1_Ej9d.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ejemplos/TP1_Ej9d.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Consignas.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ejemplos/TP1_Ej9b.json" beforeDir="false" afterPath="$PROJECT_DIR$/ejemplos/TP1_Ej9b.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/automata.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/automata.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/conversor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/conversor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/procesador.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/procesador.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/graficador.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/graficador.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/interfaces/cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaces/cli.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/interfaces/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaces/ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/manejador_archivos.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/manejador_archivos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/minimizador.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/minimizador.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/equivalencia.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/equivalencia.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/logger.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,6 +82,7 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Usuario\PycharmProjects\TpIntegrador_BonanseaMariano\ejemplos" />
+      <recent name="C:\Users\Usuario\PycharmProjects\TpIntegrador_BonanseaMariano" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -95,7 +111,7 @@
       <workItem from="1758374487534" duration="9361000" />
       <workItem from="1758471537204" duration="8112000" />
       <workItem from="1758759776820" duration="3519000" />
-      <workItem from="1758813276189" duration="9790000" />
+      <workItem from="1758813276189" duration="21192000" />
     </task>
     <task id="LOCAL-00001" summary="Primera version">
       <option name="closed" value="true" />
@@ -129,7 +145,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758479943851</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Agrega validación formal de equivalencia de autómatas por autómata producto, mejora mensajes y limpieza de archivos temporales, y documenta el proceso en README">
+      <option name="closed" value="true" />
+      <created>1758829038607</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1758829038607</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,6 +164,7 @@
     <MESSAGE value="Fixes y pruebas" />
     <MESSAGE value="Elimina metadatos de tipo de autómata en archivos y código, mejora reportes y mensajes en conversión y minimización, y ajusta manejo de archivos y gráficos" />
     <MESSAGE value="Mejora ayuda y ejemplos en README, actualiza mensajes y descripciones en CLI, y agrega archivo de ejemplo TP1_Ej9a.txt" />
-    <option name="LAST_COMMIT_MESSAGE" value="Mejora ayuda y ejemplos en README, actualiza mensajes y descripciones en CLI, y agrega archivo de ejemplo TP1_Ej9a.txt" />
+    <MESSAGE value="Agrega validación formal de equivalencia de autómatas por autómata producto, mejora mensajes y limpieza de archivos temporales, y documenta el proceso en README" />
+    <option name="LAST_COMMIT_MESSAGE" value="Agrega validación formal de equivalencia de autómatas por autómata producto, mejora mensajes y limpieza de archivos temporales, y documenta el proceso en README" />
   </component>
 </project>
