@@ -18,25 +18,39 @@ Este proyecto implementa algoritmos para:
 ```
 ├── src/
 │   ├── __init__.py
-│   ├── automata.py          # Clases para representar AFD y AFND
-│   ├── conversor.py         # Conversión AFND → AFD (algoritmo tabular)
-│   ├── minimizador.py       # Minimización de AFD
-│   ├── graficador.py        # Generación de gráficos visuales
-│   ├── manejador_archivos.py # Lectura/escritura de archivos
+│   ├── automata.py              # Clases para AFD y AFND
+│   ├── conversor.py             # Conversión AFND → AFD
+│   ├── graficador.py            # Graficación de autómatas
+│   ├── manejador_archivos.py    # Lectura/escritura de archivos
+│   ├── minimizador.py           # Minimización de AFD
 │   ├── core/
-│   │   └── procesador.py    # Procesador central de operaciones
+│   │   ├── __init__.py
+│   │   └── procesador.py        # Procesador central de operaciones
 │   ├── interfaces/
-│   │   ├── cli.py           # Interfaz de línea de comandos
-│   │   └── ui.py            # Interfaz de usuario
+│   │   ├── __init__.py
+│   │   ├── cli.py               # Interfaz de línea de comandos
+│   │   └── ui.py                # Interfaz de usuario
 │   └── utils/
-│       ├── logger.py        # Sistema de logging con iconos
-│       └── equivalencia.py  # Verificación formal de equivalencia de autómatas
-├── ejemplos/                # Archivos de ejemplo
-├── tests/                   # Casos de prueba
-├── resultados/             # Directorio de salida (generado automáticamente)
-├── main.py                 # Programa principal
-├── Consignas.md           # Consignas del trabajo práctico
-└── README.md              # Este archivo
+│       ├── __init__.py
+│       ├── equivalencia.py      # Verificación de equivalencia de AFD
+│       └── logger.py            # Sistema de logging con iconos
+├── ejemplos/                    # Archivos de ejemplo (JSON/TXT)
+│   ├── afd_simple.json
+│   ├── cadenas_prueba.json
+│   ├── ModeloParcial_Ej5.json
+│   ├── ModeloParcial_Ej5.txt
+│   ├── TP1_Ej9a.json
+│   ├── TP1_Ej9a.txt
+│   ├── TP1_Ej9b.json
+│   ├── TP1_Ej9b.txt
+│   ├── TP1_Ej9c.json
+│   ├── TP1_Ej9c.txt
+│   ├── TP1_Ej9d.json
+│   └── TP1_Ej9d.txt
+├── main.py                      # Programa principal
+├── requirements.txt             # Dependencias del proyecto
+├── Tp_Integrador-Bonansea.pdf   # Consigna/teoría del trabajo práctico
+└── README.md                    # Este archivo
 ```
 
 ### Instalación
@@ -525,4 +539,3 @@ por el autómata, brindando seguridad y robustez al proceso.
 - El validador interactivo permite probar cadenas contra el autómata de forma sencilla y rápida.
 - Al escribir "salir" en el modo interactivo de validación de cadenas, se vuelve al menú de selección de autómata; solo
   Ctrl+C finaliza el programa.
-
