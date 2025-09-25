@@ -11,10 +11,12 @@ from src.automata import AFD, AFND
 from src.conversor import ConversorTabular
 from src.minimizador import MinimizadorAFD
 from src.manejador_archivos import ManejadorArchivos
+from src.utils.equivalencia import equivalencia_afd_producto
 
 # Importar graficador solo si está disponible
 try:
     from src.graficador import GraficadorAutomatas, verificar_instalacion
+
     GRAFICACION_DISPONIBLE = True
 except ImportError:
     GRAFICACION_DISPONIBLE = False
@@ -33,7 +35,7 @@ class ProcesadorAutomatas:
         self._graficador = None
 
     def procesar_completo(self, archivo_entrada: str, directorio_salida: str = "resultados",
-                         generar_reportes: bool = True, generar_graficos: bool = False) -> Dict[str, Any]:
+                          generar_reportes: bool = True, generar_graficos: bool = False) -> Dict[str, Any]:
         """
         Procesa un autómata completo: conversión AFND->AFD y minimización.
 
@@ -92,6 +94,9 @@ class ProcesadorAutomatas:
             if generar_reportes:
                 self._generar_reportes(resultados, directorio_salida)
 
+            # Validar equivalencia tras conversión/minimización
+            self._validar_equivalencia(resultados)
+
             self.logger.separador("PROCESAMIENTO COMPLETADO")
             return resultados
 
@@ -100,7 +105,7 @@ class ProcesadorAutomatas:
             return None
 
     def convertir_solo(self, archivo_entrada: str, directorio_salida: str = "resultados",
-                      generar_reporte: bool = True) -> Optional[AFD]:
+                       generar_reporte: bool = True) -> Optional[AFD]:
         """Solo convierte AFND a AFD sin minimizar."""
         self.logger.separador("CONVERSIÓN AFND → AFD")
         self.logger.info(f"Cargando AFND desde: {archivo_entrada}", Iconos.CARGANDO)
@@ -130,7 +135,7 @@ class ProcesadorAutomatas:
             return None
 
     def minimizar_solo(self, archivo_entrada: str, directorio_salida: str = "resultados",
-                      generar_reporte: bool = True) -> Optional[AFD]:
+                       generar_reporte: bool = True) -> Optional[AFD]:
         """Solo minimiza un AFD sin conversión previa."""
         self.logger.separador("MINIMIZACIÓN DE AFD")
         self.logger.info(f"Cargando AFD desde: {archivo_entrada}", Iconos.CARGANDO)
@@ -139,7 +144,8 @@ class ProcesadorAutomatas:
             automata_original = self._cargar_automata(archivo_entrada)
 
             if isinstance(automata_original, AFND):
-                self.logger.info("El autómata es no determinista, convirtiendo a AFD antes de minimizar...", Iconos.CONVERSION)
+                self.logger.info("El autómata es no determinista, convirtiendo a AFD antes de minimizar...",
+                                 Iconos.CONVERSION)
                 from src.conversor import ConversorTabular
                 conversor = ConversorTabular()
                 automata_original = conversor.convertir(automata_original)
@@ -164,7 +170,8 @@ class ProcesadorAutomatas:
 
             # Guardar resultado
             if directorio_salida:
-                self._guardar_minimizacion(automata_original, afd_minimizado, archivo_entrada, directorio_salida, generar_reporte)
+                self._guardar_minimizacion(automata_original, afd_minimizado, archivo_entrada, directorio_salida,
+                                           generar_reporte)
 
             return afd_minimizado
 
@@ -173,7 +180,7 @@ class ProcesadorAutomatas:
             return None
 
     def graficar_solo(self, archivo_entrada: str, directorio_salida: str = "graficos",
-                     formatos: list = ['png']) -> bool:
+                      formatos: list = ['png']) -> bool:
         """Genera solo gráficos de un autómata sin procesamiento adicional."""
         if not GRAFICACION_DISPONIBLE:
             self.logger.error("Módulo de graficación no disponible. Instale: pip install graphviz")
@@ -388,7 +395,7 @@ class ProcesadorAutomatas:
             self.logger.info(f"Reporte guardado en: {archivo_reporte}", Iconos.REPORTE)
 
     def convertir_tabular(self, archivo_entrada: str, directorio_salida: str = "resultados",
-                         generar_reporte: bool = True) -> Optional[AFD]:
+                          generar_reporte: bool = True) -> Optional[AFD]:
         """Convierte AFND a AFD usando el algoritmo tabular optimizado."""
         self.logger.separador("CONVERSIÓN TABULAR AFND → AFD")
         self.logger.info(f"Cargando AFND desde: {archivo_entrada}", Iconos.CARGANDO)
@@ -414,7 +421,8 @@ class ProcesadorAutomatas:
 
             # Guardar resultado
             if directorio_salida:
-                self._guardar_conversion_tabular(automata_original, afd, archivo_entrada, directorio_salida, generar_reporte)
+                self._guardar_conversion_tabular(automata_original, afd, archivo_entrada, directorio_salida,
+                                                 generar_reporte)
 
             return afd
 
@@ -440,44 +448,17 @@ class ProcesadorAutomatas:
             self.logger.info(f"Reporte tabular guardado en: {archivo_reporte}", Iconos.REPORTE)
 
     def _validar_equivalencia(self, resultados):
-        """Valida que los autómatas sean equivalentes probando cadenas."""
+        """Valida que los autómatas sean equivalentes usando el método formal del autómata producto y deja el log aquí."""
         original = resultados['original']
         minimizado = resultados['minimizado']
-
-        # Generar cadenas de prueba
-        cadenas_prueba = self._generar_cadenas_prueba(original)
-
-        equivalentes = True
-        for cadena in cadenas_prueba:
-            acepta_original = original.validar_cadena(cadena)
-            acepta_minimizado = minimizado.validar_cadena(cadena)
-
-            if acepta_original != acepta_minimizado:
-                self.logger.error(f"¡ERROR! Cadena '{cadena}': Original={acepta_original}, Minimizado={acepta_minimizado}")
-                equivalentes = False
-
-        # Solo mostrar mensaje si hay error
-        if not equivalentes:
-            self.logger.error("Los autómatas NO son equivalentes", Iconos.CRUZ)
-        # Si son equivalentes, no mostrar nada (validación silenciosa)
-
-    def _generar_cadenas_prueba(self, automata):
-        """Genera cadenas de prueba para validar equivalencia."""
-        cadenas = [""]  # Cadena vacía
-        alfabeto_lista = list(automata.alfabeto - {''})  # Remover epsilon si existe
-
-        # Cadenas de longitud 1
-        cadenas.extend(alfabeto_lista)
-
-        # Cadenas de longitud 2
-        for a in alfabeto_lista:
-            for b in alfabeto_lista:
-                cadenas.append(a + b)
-
-        # Algunas cadenas de longitud 3
-        for a in alfabeto_lista[:min(2, len(alfabeto_lista))]:
-            for b in alfabeto_lista[:min(2, len(alfabeto_lista))]:
-                for c in alfabeto_lista[:min(2, len(alfabeto_lista))]:
-                    cadenas.append(a + b + c)
-
-        return cadenas
+        equivalentes = equivalencia_afd_producto(original, minimizado)
+        if equivalentes:
+            self.logger.success(
+                "Los autómatas son equivalentes (verificación formal por autómata producto)",
+                Iconos.COMPLETADO
+            )
+        else:
+            self.logger.error(
+                "Los autómatas NO son equivalentes (existe una cadena aceptada por uno y rechazada por el otro)",
+                Iconos.FALLÓ
+            )

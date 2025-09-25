@@ -4,13 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9de18ca8-10da-4f78-b6dd-e487d9aa2a8a" name="Changes" comment="Elimina metadatos de tipo de autómata en archivos y código, mejora reportes y mensajes en conversión y minimización, y ajusta manejo de archivos y gráficos">
-      <change afterPath="$PROJECT_DIR$/ejemplos/TP1_Ej9a.txt" afterDir="false" />
+    <list default="true" id="9de18ca8-10da-4f78-b6dd-e487d9aa2a8a" name="Changes" comment="Mejora ayuda y ejemplos en README, actualiza mensajes y descripciones en CLI, y agrega archivo de ejemplo TP1_Ej9a.txt">
+      <change afterPath="$PROJECT_DIR$/src/utils/equivalencia.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ejemplos/afnd_ejemplo.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ejemplos/afnd_texto.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/interfaces/cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaces/cli.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/procesador.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/procesador.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/interfaces/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/interfaces/ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/logger.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,7 +93,9 @@
       <workItem from="1758230817199" duration="1530000" />
       <workItem from="1758232604011" duration="52000" />
       <workItem from="1758374487534" duration="9361000" />
-      <workItem from="1758471537204" duration="8079000" />
+      <workItem from="1758471537204" duration="8112000" />
+      <workItem from="1758759776820" duration="3519000" />
+      <workItem from="1758813276189" duration="9790000" />
     </task>
     <task id="LOCAL-00001" summary="Primera version">
       <option name="closed" value="true" />
@@ -119,7 +121,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758417567168</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Mejora ayuda y ejemplos en README, actualiza mensajes y descripciones en CLI, y agrega archivo de ejemplo TP1_Ej9a.txt">
+      <option name="closed" value="true" />
+      <created>1758479943851</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1758479943851</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,6 +139,7 @@
     <MESSAGE value="Primera version" />
     <MESSAGE value="Fixes y pruebas" />
     <MESSAGE value="Elimina metadatos de tipo de autómata en archivos y código, mejora reportes y mensajes en conversión y minimización, y ajusta manejo de archivos y gráficos" />
-    <option name="LAST_COMMIT_MESSAGE" value="Elimina metadatos de tipo de autómata en archivos y código, mejora reportes y mensajes en conversión y minimización, y ajusta manejo de archivos y gráficos" />
+    <MESSAGE value="Mejora ayuda y ejemplos en README, actualiza mensajes y descripciones en CLI, y agrega archivo de ejemplo TP1_Ej9a.txt" />
+    <option name="LAST_COMMIT_MESSAGE" value="Mejora ayuda y ejemplos en README, actualiza mensajes y descripciones en CLI, y agrega archivo de ejemplo TP1_Ej9a.txt" />
   </component>
 </project>

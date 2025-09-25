@@ -42,8 +42,6 @@ class Iconos:
 
     # Navegación y UI
     FLECHA_DERECHA = "➤"
-    CHECK = "✓"
-    CRUZ = "✗"
     CADENA = "🔗"
     ARCHIVO = "📄"
     DIRECTORIO = "📁"

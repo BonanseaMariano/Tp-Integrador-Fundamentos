@@ -64,6 +64,10 @@ class InterfazUsuario:
 
     def validar_cadenas_interactivo(self, ruta_entrada: str) -> int:
         """Modo interactivo para validar cadenas en un autómata."""
+        import os
+        from pathlib import Path
+        temp_min_path = Path(ruta_entrada)
+        es_temp_min = temp_min_path.name == "temp_minimizado.json"
         try:
             automata = self._cargar_automata(ruta_entrada)
             self._mostrar_info_automata(automata)
@@ -79,7 +83,7 @@ class InterfazUsuario:
                         break
 
                     resultado = automata.validar_cadena(cadena)
-                    icono_resultado = Iconos.CHECK if resultado else Iconos.CRUZ
+                    icono_resultado = Iconos.COMPLETADO if resultado else Iconos.FALLÓ
                     estado = "ACEPTADA" if resultado else "RECHAZADA"
                     self.logger.info(f"'{cadena}' -> {estado}", icono_resultado)
 
@@ -94,13 +98,20 @@ class InterfazUsuario:
         except Exception as e:
             self.logger.error(f"Error: {e}")
             return 1
+        finally:
+            # Eliminar archivo temporal si corresponde
+            if es_temp_min and temp_min_path.exists():
+                try:
+                    os.remove(temp_min_path)
+                except Exception as e:
+                    self.logger.error(f"No se pudo eliminar el archivo temporal: {e}")
 
     def validar_cadena_especifica(self, ruta_entrada: str, cadena: str) -> int:
         """Valida una cadena específica en un autómata."""
         try:
             automata = self._cargar_automata(ruta_entrada)
             resultado = automata.validar_cadena(cadena)
-            icono_resultado = Iconos.CHECK if resultado else Iconos.CRUZ
+            icono_resultado = Iconos.COMPLETADO if resultado else Iconos.FALLÓ
             estado = "ACEPTADA" if resultado else "RECHAZADA"
 
             self.logger.info(f"Cadena '{cadena}'", Iconos.CADENA)
@@ -140,15 +151,8 @@ class InterfazUsuario:
             self.logger.info(f"📂 Cargando autómata desde: {archivo_automata}", Iconos.CARGANDO)
             automata = self._cargar_automata(archivo_automata)
 
-            # Mostrar información del autómata con descripción
-            tipo_icono = Iconos.AFND if isinstance(automata, AFND) else Iconos.AFD
-            self.logger.info(f"Autómata: {type(automata).__name__} con {len(automata.estados)} estados", tipo_icono)
-
-            # Mostrar descripción si está disponible
-            if hasattr(automata, 'descripcion') and automata.descripcion:
-                self.logger.info(f"📝 Descripción: {automata.descripcion}", Iconos.INFO)
-            else:
-                self.logger.warning("📝 Sin descripción disponible", Iconos.ADVERTENCIA)
+            # Mostrar información completa del autómata (incluye descripción)
+            self._mostrar_info_automata(automata)
 
             # Validar todas las cadenas
             self.logger.separador("VALIDACIÓN DE MÚLTIPLES CADENAS")
@@ -162,7 +166,7 @@ class InterfazUsuario:
                 cadena_str = str(cadena)  # Asegurar que es string
                 resultado = automata.validar_cadena(cadena_str)
 
-                icono_resultado = Iconos.CHECK if resultado else Iconos.CRUZ
+                icono_resultado = Iconos.COMPLETADO if resultado else Iconos.FALLÓ
                 estado = "✅ ACEPTADA" if resultado else "❌ RECHAZADA"
 
                 # Mostrar cadena vacía como λ para mejor visualización
@@ -187,7 +191,8 @@ class InterfazUsuario:
             if len(cadenas) >= 10:
                 guardar, ruta_personalizada = self._preguntar_guardar_reporte()
                 if guardar:
-                    self._guardar_reporte_validacion(archivo_cadenas, archivo_automata, resultados, automata, ruta_personalizada)
+                    self._guardar_reporte_validacion(archivo_cadenas, archivo_automata, resultados, automata,
+                                                     ruta_personalizada)
 
             return 0
 
@@ -224,16 +229,17 @@ class InterfazUsuario:
 
         tipo_icono = Iconos.AFND if isinstance(automata, AFND) else Iconos.AFD
         self.logger.info(f"Autómata: {type(automata).__name__}", tipo_icono)
-        self.logger.info(f"Estados: {len(automata.estados)} ({', '.join(sorted(automata.estados, key=str))})", Iconos.ESTADOS)
+        self.logger.info(f"Estados: {len(automata.estados)} ({', '.join(sorted(automata.estados, key=str))})",
+                         Iconos.ESTADOS)
         self.logger.info(f"Alfabeto: {automata.alfabeto}", Iconos.ALFABETO)
         self.logger.info(f"Estado inicial: {automata.estado_inicial}", Iconos.INICIAL)
         self.logger.info(f"Estados finales: {', '.join(sorted(automata.estados_finales, key=str))}", Iconos.FINAL)
 
         # Mostrar descripción si está disponible
         if hasattr(automata, 'descripcion') and automata.descripcion:
-            self.logger.info(f"Descripción: {automata.descripcion}")
+            self.logger.info(f"Descripción: {automata.descripcion}", Iconos.INFO)
         else:
-            self.logger.warning("Descripción: No disponible")
+            self.logger.warning("Descripción: No disponible", Iconos.ADVERTENCIA)
 
     def _preguntar_guardar_reporte(self) -> tuple[bool, str]:
         """Pregunta al usuario si desea guardar un reporte de validación y dónde."""
@@ -249,7 +255,8 @@ class InterfazUsuario:
         except (KeyboardInterrupt, EOFError):
             return False, ""
 
-    def _guardar_reporte_validacion(self, archivo_cadenas: str, ruta_automata: str, resultados: list, automata, ruta_personalizada: str = ""):
+    def _guardar_reporte_validacion(self, archivo_cadenas: str, ruta_automata: str, resultados: list, automata,
+                                    ruta_personalizada: str = ""):
         """Guarda un reporte detallado de la validación."""
         try:
             from datetime import datetime

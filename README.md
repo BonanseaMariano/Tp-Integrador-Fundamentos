@@ -51,14 +51,6 @@ Este proyecto implementa algoritmos para:
     - **Linux**: `sudo apt-get install graphviz` (Ubuntu/Debian) o `sudo yum install graphviz` (CentOS/RHEL)
     - **macOS**: `brew install graphviz`
 
-#### Verificar instalación de Graphviz
-
-```python
-from src.graficador import verificar_instalacion
-
-print(verificar_instalacion())
-```
-
 ### Uso
 
 ### Comandos disponibles
@@ -502,3 +494,22 @@ def clausura_epsilon(self, estados):
 - Se expande el conjunto de estados actuales con todos los alcanzables por transiciones epsilon.
 
 ---
+
+### Validación automática de equivalencia de autómatas
+
+Después de cada conversión (AFND → AFD) y minimización, el sistema valida automáticamente que el autómata resultante sea
+equivalente al original. Esta verificación se realiza de forma interna y se informa en el log del proceso.
+
+#### ¿Cómo se realiza la validación?
+
+- Se utiliza el **método del autómata producto** (ver `src/utils/equivalencia.py`).
+- El procedimiento recorre en paralelo los estados de ambos AFD, comenzando desde sus estados iniciales.
+- Para cada par de estados, se verifica si uno es final y el otro no. Si esto ocurre, se detecta una cadena que
+  distingue ambos lenguajes y se concluye que no son equivalentes.
+- Se exploran todas las transiciones posibles para cada símbolo del alfabeto, asegurando que no exista ninguna cadena
+  que sea aceptada por uno y rechazada por el otro.
+- Si no se encuentra ninguna diferencia, los autómatas se consideran equivalentes y el sistema lo informa
+  automáticamente.
+
+Esta validación automática garantiza que las operaciones de conversión y minimización no alteran el lenguaje aceptado
+por el autómata, brindando seguridad y robustez al proceso.
