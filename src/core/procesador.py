@@ -484,9 +484,19 @@ class ProcesadorAutomatas:
 
     def _validar_equivalencia(self, resultados):
         """Valida que los autómatas sean equivalentes usando el método formal del autómata producto y deja el log aquí."""
-        original = resultados['original']
+        afd = resultados['afd']
         minimizado = resultados['minimizado']
-        equivalentes = equivalencia_afd_producto(original, minimizado)
+
+        # Solo validar si tenemos ambos AFDs
+        if afd is None:
+            self.logger.warning("No hay AFD convertido disponible para validar equivalencia", Iconos.INFO)
+            return
+
+        if minimizado is None:
+            self.logger.warning("No hay AFD minimizado disponible para validar equivalencia", Iconos.INFO)
+            return
+
+        equivalentes = equivalencia_afd_producto(afd, minimizado)
         if equivalentes:
             self.logger.success(
                 "Los autómatas son equivalentes",
