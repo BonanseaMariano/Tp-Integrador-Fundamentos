@@ -75,6 +75,7 @@ class Logger:
             level (LogLevel): Nivel de logging inicial.
         """
         self.level = level
+        self.separador = "-" * 50  # Separador visual para los mensajes
 
     def set_level(self, level: str):
         """

@@ -71,7 +71,8 @@ class ProcesadorAutomatas:
         Returns:
             dict: Diccionario con los autómatas en cada etapa y resultados intermedios.
         """
-        self.logger.separador("PROCESADOR DE AUTÓMATAS FINITOS")
+        self.logger.info(self.logger.separador)
+        self.logger.info("PROCESADOR DE AUTÓMATAS FINITOS")
         self.logger.info(f"Cargando autómata desde: {archivo_entrada}", Iconos.CARGANDO)
 
         try:
@@ -120,7 +121,8 @@ class ProcesadorAutomatas:
             # Validar equivalencia tras conversión/minimización
             self._validar_equivalencia(resultados)
 
-            self.logger.separador("PROCESAMIENTO COMPLETADO")
+            self.logger.info(self.logger.separador)
+            self.logger.info("PROCESAMIENTO COMPLETADO")
             return resultados
 
         except Exception as e:
@@ -140,7 +142,8 @@ class ProcesadorAutomatas:
         Returns:
             AFD convertido o None si falla.
         """
-        self.logger.separador("CONVERSIÓN AFND → AFD")
+        self.logger.info(self.logger.separador)
+        self.logger.info("CONVERSIÓN AFND → AFD")
         self.logger.info(f"Cargando AFND desde: {archivo_entrada}", Iconos.CARGANDO)
 
         try:
@@ -180,7 +183,8 @@ class ProcesadorAutomatas:
         Returns:
             AFD minimizado o None si falla.
         """
-        self.logger.separador("MINIMIZACIÓN DE AFD")
+        self.logger.info(self.logger.separador)
+        self.logger.info("MINIMIZACIÓN DE AFD")
         self.logger.info(f"Cargando AFD desde: {archivo_entrada}", Iconos.CARGANDO)
 
         try:
@@ -215,7 +219,8 @@ class ProcesadorAutomatas:
             self.logger.error("Módulo de graficación no disponible. Instale: pip install graphviz")
             return False
 
-        self.logger.separador("GRAFICACIÓN DE AUTÓMATA")
+        self.logger.info(self.logger.separador)
+        self.logger.info("GRAFICACIÓN DE AUTÓMATA")
         self.logger.info(f"Cargando autómata desde: {archivo_entrada}", Iconos.CARGANDO)
 
         try:
@@ -426,7 +431,8 @@ class ProcesadorAutomatas:
     def convertir_tabular(self, archivo_entrada: str, directorio_salida: str = "resultados",
                           generar_reporte: bool = True) -> Optional[AFD]:
         """Convierte AFND a AFD usando el algoritmo tabular optimizado."""
-        self.logger.separador("CONVERSIÓN TABULAR AFND → AFD")
+        self.logger.info(self.logger.separador)
+        self.logger.info("CONVERSIÓN TABULAR AFND → AFD")
         self.logger.info(f"Cargando AFND desde: {archivo_entrada}", Iconos.CARGANDO)
 
         try:
