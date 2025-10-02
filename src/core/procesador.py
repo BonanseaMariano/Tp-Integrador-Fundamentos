@@ -495,5 +495,5 @@ class ProcesadorAutomatas:
         else:
             self.logger.error(
                 "Los autómatas NO son equivalentes (existe una cadena aceptada por uno y rechazada por el otro)",
-                Iconos.FALLÓ
+                Iconos.FALLO
             )
